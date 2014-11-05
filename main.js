@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var request = require('request');
 var mysql = require('mysql');
-var bodyparser = require('body-parser'); // can detect name attribute in html file
+var bodyparser = require('body-parser'); // request body to hash;detect name attribute in html file
 var app = express();
 
 app.use(bodyparser.urlencoded({
@@ -114,30 +114,28 @@ app.all('/sections/add', function(req, res){
     var msg = 'add successfully';
     var values = '\'' + body.name + '\',\'' + body.description + '\','+ 1;
 
-    var query = connection.query('INSERT INTO Section(name, description, status) VALUES('+values+')', function(err, rows, fields) {
-      if (!err) {
-        if (body.name == "" || body.name == undifined) {
-          console.log("empty name");
-          res.render('add-section-form.html', {
-            except : 'no name'
-          });
-        }
-        else {
+    if (body.name == '' || body.name === undefined) {
+      console.log("empty name");
+      res.render('add-section-form.html', {
+        except : 'no name'
+      });
+    }
+    else {
+      var query = connection.query('INSERT INTO Section(name, description, status) VALUES('+values+')', function(err, rows, fields) {
+        if (!err) {
           res.redirect('/sections?msge='+msg);
+        } else {
+          res.render(err);
         }
-      } else {
-        res.render(err);
-      }
-    });
-    console.log(query.sql);
+      });
+      console.log(query.sql);
+    }
   }
 });
 
-var server = app.listen(3000, function() {
 
+var server = app.listen(3000, function() {
   var host = server.address().address;
   var port = server.address().port;
-
   console.log('Example app listening at http://%s:%s', host, port);
-
 });
