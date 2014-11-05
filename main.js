@@ -1,7 +1,7 @@
 var nunjucks = require('nunjucks'); //package
 var express = require('express');
 var path = require('path');
-var request = require('request');
+//var request = require('request');
 var mysql = require('mysql');
 var bodyparser = require('body-parser'); // request body to hash;detect name attribute in html file
 var app = express();
