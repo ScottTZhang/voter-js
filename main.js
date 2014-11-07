@@ -118,19 +118,20 @@ app.all('/sections/add', function(req, res){
     });
   }
   else if (req.method == 'POST') {
-    console.log(req.body);
 
     var body = req.body;
-    var msg = 'add successfully';
-    var values = '\'' + body.name + '\',\'' + body.description + '\','+ 1;
 
     if (body.name == '' || body.name === undefined) {
       console.log("empty name");
+      console.log(body);
       res.render('add-section-form.html', {
-        except : 'no name'
+        except : 'no name',
+        cache : body
       });
     }
     else {
+    var msg = 'add successfully';
+    var values = '\'' + body.name + '\',\'' + body.description + '\','+ 1;
       var query = connection.query('INSERT INTO Section(name, description, status) VALUES('+values+')', function(err, rows, fields) {
         if (!err) {
           res.redirect('/sections?msge='+msg);
