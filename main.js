@@ -69,21 +69,14 @@ app.get('/section/delete/:id', function(req, res) {
 });
 
 app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in this part of url is called 'id'
-  console.log(req.method);
-
   var id = req.params.id; //get the 'id' part from the url, not from qurey string; from query string use req.query.'...'
-  if (req.method == 'GET' || (req.method == 'POST' && (req.body.name == '' || req.body.name == undefined ))) {//req default method is GET
-
+  if (req.method == 'GET') {//req default method is GET
     var noNameExcept = undefined;
-    if (req.method == 'POST' && (req.body.name == '' || req.body.name == undefined)) {
-      noNameExcept = 'Must give a name';
-    }
-
     connection.query('SELECT * FROM Section WHERE id='+id, function(err, rows, fields){
       if (!err) {
         if (rows.length > 0) {
           res.render('edit-section-form.html', {
-            data : rows,
+            data : rows[0],
             except : noNameExcept
           });
         } else {
@@ -96,22 +89,29 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
   }
   else if (req.method == 'POST') {//can be set method to POST in html file form tag
     var body = req.body;//a hashtable with names and values got from html tag with 'name' attribute
-    var msg = 'edit successfully';
-
-    var query = connection.query('UPDATE Section SET ? where id='+id, body, function(err, rows, fields){ // this will automatic match table column names with names in body, and change values
-      if (!err) {
-        res.redirect('/sections?msge='+msg);//make msg a part of query string so that req.query.msge will find msg
-      } else {
-        res.send(err);
-      }
-    });
+    body.id = id;
+    if (body.name == '' || body.name == undefined) {
+      res.render('edit-section-form.html', {
+        data : body,
+        except : 'no name input'
+      });
+    }
+    else {
+      var msg = 'edit successfully';
+      var query = connection.query('UPDATE Section SET ? where id='+id, body, function(err, rows, fields){ // this will automatic match table column names with names in body, and change values
+        if (!err) {
+          res.redirect('/sections?msge='+msg);//make msg a part of query string so that req.query.msge will find msg
+        } else {
+          res.send(err);
+        }
+      });
+    }
   }
 });
 
 /* problem: when input name is '', it should not post
  * */
 app.all('/sections/add', function(req, res){
-  console.log(req.method);
   if (req.method == 'GET') {
     res.render('add-section-form.html',{
       except : ''
@@ -142,7 +142,6 @@ app.all('/sections/add', function(req, res){
     }
   }
 });
-
 
 var server = app.listen(3000, function() {
   var host = server.address().address;

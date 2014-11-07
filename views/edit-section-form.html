@@ -21,19 +21,19 @@
       {{ except }}
     </div>
     {% endif %}
-    <form method="POST" action="/sections/edit/{{data[0].id}}" class="form-horizontal" role="form"><!--action means the post will make effect on which url-->
+    <form method="POST" action="/sections/edit/{{data.id}}" class="form-horizontal" role="form"><!--action means the post will make effect on which url-->
 
       <div class="form-group form-group-lg">
         <label for="forName" class="col-sm-2 control-label">Name</label>
         <div class="col-sm-10">
-          <input type="text" name="name" class="form-control input-lg" id="forName" placeholder="create a name here" value="{{data[0].name}}"><!--use 'name' attribute so the name and value will be store in req.body-->
+          <input type="text" name="name" class="form-control input-lg" id="forName" placeholder="create a name here" value="{{data.name}}"><!--use 'name' attribute so the name and value will be store in req.body-->
         </div>
       </div>
 
       <div class="form-group">
         <label for="forDescription" class="col-sm-2 control-label">Description</label>
         <div class="col-sm-10">
-          <textarea name="description" class="form-control" placeholder="put some description" id="forDescription" rows="3"> {{data[0].description}}</textarea> <!--value is between tag-->
+          <textarea name="description" class="form-control" placeholder="put some description" id="forDescription" rows="3"> {{data.description}}</textarea> <!--value is between tag-->
         </div>
       </div>
       <div class="form-group">
