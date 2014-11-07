@@ -71,13 +71,12 @@ app.get('/section/delete/:id', function(req, res) {
 app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in this part of url is called 'id'
   var id = req.params.id; //get the 'id' part from the url, not from qurey string; from query string use req.query.'...'
   if (req.method == 'GET') {//req default method is GET
-    var noNameExcept = undefined;
     connection.query('SELECT * FROM Section WHERE id='+id, function(err, rows, fields){
       if (!err) {
         if (rows.length > 0) {
           res.render('edit-section-form.html', {
             data : rows[0],
-            except : noNameExcept
+            except: undefined
           });
         } else {
           res.status(404).send('not found'); //if query result is empty, return 404 page
