@@ -16,6 +16,11 @@
   <div class="rows">
     <h1>Edit a section</h1>
     <p>Here you can edit a section.</p>
+    {% if except %}
+    <div class="alert alert-warning" role="alert">
+      {{ except }}
+    </div>
+    {% endif %}
     <form method="POST" action="/sections/edit/{{data[0].id}}" class="form-horizontal" role="form"><!--action means the post will make effect on which url-->
 
       <div class="form-group form-group-lg">

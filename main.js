@@ -26,25 +26,15 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-getSource = function(url, cb){
-  request(url, function(error, response, body) {
-    cb(error, body);
-  })
-};
-
 app.get('/', function(req, res) {
-
   if (req.query.q) { // get string from url ?q=...
     var query = req.query.q;
-    getSource(query, function(error, body){
-      res.render('index.html', {
-        source: body //give a name for body called source, source will be used in html file
-      });
+    res.render('index.html', {
+      source: query //give a name for body called source, source will be used in html file
     });
   } else {
     res.render('index.html');
   }
-
 });
 
 app.get('/sections', function(req, res) {// /sections is website page, and has nothing to do with file path
@@ -65,17 +55,36 @@ app.get('/sections', function(req, res) {// /sections is website page, and has n
 
 });
 
+app.get('/section/delete/:id', function(req, res) {
+  var id = req.params.id;
+  var msg = 'delete suceessfully.';
+  var query = connection.query('UPDATE Section SET status = 0 WHERE id=' + id, function(err, rows, fields) {
+    if (!err) {
+      res.redirect('/sections?msge='+msg);
+    } else {
+      res.render(err);
+    }
+  });
+  console.log(query.sql);
+});
+
 app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in this part of url is called 'id'
   console.log(req.method);
 
   var id = req.params.id; //get the 'id' part from the url, not from qurey string; from query string use req.query.'...'
-  if (req.method == 'GET') {//req default method is GET
-    connection.query('SELECT * FROM Section WHERE id='+id, function(err, rows, fields){
+  if (req.method == 'GET' || (req.method == 'POST' && (req.body.name == '' || req.body.name == undefined ))) {//req default method is GET
 
+    var noNameExcept = undefined;
+    if (req.method == 'POST' && (req.body.name == '' || req.body.name == undefined)) {
+      noNameExcept = 'Must give a name';
+    }
+
+    connection.query('SELECT * FROM Section WHERE id='+id, function(err, rows, fields){
       if (!err) {
         if (rows.length > 0) {
           res.render('edit-section-form.html', {
-            data : rows
+            data : rows,
+            except : noNameExcept
           });
         } else {
           res.status(404).send('not found'); //if query result is empty, return 404 page
@@ -88,6 +97,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
   else if (req.method == 'POST') {//can be set method to POST in html file form tag
     var body = req.body;//a hashtable with names and values got from html tag with 'name' attribute
     var msg = 'edit successfully';
+
     var query = connection.query('UPDATE Section SET ? where id='+id, body, function(err, rows, fields){ // this will automatic match table column names with names in body, and change values
       if (!err) {
         res.redirect('/sections?msge='+msg);//make msg a part of query string so that req.query.msge will find msg
