@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>voter sections</title>
+<!-- Bootstrap core CSS -->
+<link href="/public/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+{% for question in questions %}
+  {% if loop.index == 1 or questions[loop.index-1].qid != questions[loop.index-2].qid %}
+    {% if loop.index != 1 %}
+      </div>
+    {% endif %}
+    <h4>{{questions[loop.index-1].question}}</h4>
+    <div>
+    <div class="radio">
+      <label>
+        <input type="radio" name="question_{{questions[loop.index-1].qid}}" id="option_{{questions[loop.index-1].iid}}" value="{{questions[loop.index-1].item}}" >
+          {{questions[loop.index-1].item}}
+      </label>
+    </div>
+  {% else %}
+    <div class="radio">
+      <label>
+        <input type="radio" name="question_{{questions[loop.index-1].qid}}" id="option_{{questions[loop.index-1].iid}}" value="{{questions[loop.index-1].item}}">
+          {{questions[loop.index-1].item}}
+      </label>
+    </div>
+  {% endif %}
+{% endfor %}
+</div>
+
+</body>
+
+</html>

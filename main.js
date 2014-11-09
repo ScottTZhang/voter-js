@@ -27,7 +27,7 @@ var connection = mysql.createConnection({
 connection.connect();
 
 app.get('/', function(req, res) {
-  if (req.query.q) { // get string from url ?q=...
+  if (req.query.q) { // get string from query string in url ?q=...
     var query = req.query.q;
     res.render('index.html', {
       source: query //give a name for body called source, source will be used in html file
@@ -39,7 +39,7 @@ app.get('/', function(req, res) {
 
 app.get('/sections', function(req, res) {// /sections is website page, and has nothing to do with file path
 
-  var msg = req.query.msge; //get msge from quesry string, ?msge=...
+  var msg = req.query.msge; //get msge from quesry string in url, ?msge=...
   connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
 
     if (!err) {
@@ -54,6 +54,48 @@ app.get('/sections', function(req, res) {// /sections is website page, and has n
   });
 
 });
+
+/*  test: When select a section, show all surveys
+ */
+app.get('/section/:id', function(req, res) {
+  var id = req.params.id;
+  var query = connection.query('SELECT * from Survey WHERE status=1 AND sectionId='+id, function(err, rows, fields) {
+    if (!err) {
+      console.log(rows);
+      res.render('section.html', {
+       surveys : rows
+      });
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+/*  test: When select a survey, show all questions and items from the survey
+ */
+app.get('/survey/:id', function(req, res) {
+  var id = req.params.id;
+  var sql ='SELECT Question.id AS qid, Item.id AS iid,title,question,item from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
+  //var sql ='SELECT * from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id;';
+  var query = connection.query(sql, function(err, rows, fields) {
+    if (!err) {
+      console.log('survey ' + id);
+      console.log(rows);
+      res.render('survey.html',{
+        questions : rows
+      });
+    } else {
+      console.log(err);
+    }
+  });
+});
+
+/* test: When edit a item from a question in a suvey, get the item id from:
+ *  SELECT Item.id,title,question,item from Survey,Question,Item where Survey.id=4 And Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id;
+ *  get the question id from :SELECT Question.id,title,question from Survey,Question where Survey.id=4 And Survey.status=1 AND Question.surveyId=Survey.id;
+ *  get the item id from: Select Item.id from Question,Item where Question.status=1 AND Question.id=Item.questionId;
+ *  count the question in the survey: SELECT COUNT(*) from Survey, Question where Survey.status=1 AND Survey.id=4 AND Question.surveyId=Survey.id AND Question.Status=1;
+ */
 
 app.get('/section/delete/:id', function(req, res) {
   var id = req.params.id;
@@ -109,7 +151,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
 });
 
 /* problem: when input name is '', it should not post
- * */
+ */
 app.all('/sections/add', function(req, res){
   if (req.method == 'GET') {
     res.render('add-section-form.html',{

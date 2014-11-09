@@ -62,10 +62,12 @@ INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `section
 INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (2, 'how are you?', 'as you see', 1, 'admin', 3);
 INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (3, 'how much do you want?', 'as you see', 1, 'admin', 2);
 INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (4, 'where are you from?', 'as you see', 1, 'admin', 1);
+INSERT INTO `Survey` (`title`, `description`, `status`, `holder`, `sectionId`) VALUES ('what do you do', 'for living, not for fun!', 1, 'admin', 1);
 
 INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (1,'how old are you?!', 1, 1);
 INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (2,'which country?!', 1, 4);
 INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (3,'which state/province?!', 1, 4);
+INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (4,'choose occupation', 1, 5);
 
 INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('11-20', 1, 1);
 INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('21-30', 1, 1);
@@ -75,3 +77,6 @@ INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('India', 1, 2);
 INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('IL', 1, 3);
 INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('CA', 1, 3);
 INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Guangxi', 1, 3);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Student', 1, 4);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Software Development Vase', 1, 4);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Software Development Dog', 1, 4);
