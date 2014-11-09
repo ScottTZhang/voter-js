@@ -13,6 +13,9 @@
 </head>
 
 <body>
-submit successfully
+{% if msg %}
+<h4>{{ msg }}</h4>
+<p><a href="/result/{{id}}">View result</a></p>
+{% endif %}
 </body>
 </html>

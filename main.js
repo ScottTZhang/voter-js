@@ -112,7 +112,6 @@ app.all('/survey/:id', function(req, res) {
             if (rows.length == 0) {
               res.status(404).send('Survey not found');
             } else {
-              console.log(rows);
               cnt = rows[0].cntQuestion;
             }
           } else {
@@ -157,7 +156,15 @@ app.all('/survey/:id', function(req, res) {
 app.get('/display/survey/:id', function(req, res) {
   var id = req.params.id;
   var successSubmit = 'submit successfully';
-  res.render('display.html');
+  res.render('display.html', {
+    msg: successSubmit,
+    id: id
+  });
+});
+
+app.get('/result/:id', function(req, res) {
+  var id = req.params.id;
+  console.log(id);
 });
 
 /* test: When edit a item from a question in a suvey, get the item id from:
