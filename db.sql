@@ -5,51 +5,64 @@ use voter;
 
 DROP TABLE IF EXISTS `Section`;
 CREATE TABLE `Section` (
-      `id` int NOT NULL AUTO_INCREMENT,
-      `name` varchar(40) NOT NULL,
-      `description` varchar(600) NOT NULL,
-      `status` tinyint,
-      PRIMARY KEY (`id`)
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(40) NOT NULL,
+  `description` varchar(600) NOT NULL,
+  `status` tinyint,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `Survey`;
 CREATE TABLE `Survey` (
-    `id` int NOT NULL AUTO_INCREMENT,
-    `title` varchar(140) NOT NULL,
-    `description` varchar(600) NOT NULL,
-    `status` tinyint,
-    `holder` varchar(40) NOT NULL,
-    `sectionId` int,
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`sectionId`) REFERENCES `Section`(`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(140) NOT NULL,
+  `description` varchar(600) NOT NULL,
+  `status` tinyint,
+  `holder` varchar(40) NOT NULL,
+  `sectionId` int,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`sectionId`) REFERENCES `Section`(`id`)
+  ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `Question`;
 CREATE TABLE `Question` (
-    `id` int NOT NULL AUTO_INCREMENT,
-    `question` varchar(600) NOT NULL,
-    `status` tinyint,
-    `surveyId` int,
-    `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `modifiedTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY(`id`),
-    FOREIGN KEY (`surveyId`) REFERENCES `Survey`(`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE
+  `id` int NOT NULL AUTO_INCREMENT,
+  `question` varchar(600) NOT NULL,
+  `status` tinyint,
+  `surveyId` int,
+  `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `modifiedTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(`id`),
+  FOREIGN KEY (`surveyId`) REFERENCES `Survey`(`id`)
+  ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `Item`;
 CREATE TABLE `Item` (
-    `id` int NOT NULL AUTO_INCREMENT,
-    `item` varchar(888) NOT NULL,
-    `status` tinyint,
-    `questionId` int,
-    `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `modifiedTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY(`id`),
-    FOREIGN KEY(`questionId`) REFERENCES `Question`(`id`)
-    ON DELETE CASCADE ON UPDATE CASCADE
+  `id` int NOT NULL AUTO_INCREMENT,
+  `item` varchar(888) NOT NULL,
+  `status` tinyint,
+  `questionId` int,
+  `count` int DEFAULT 0,
+  `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `modifiedTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(`id`),
+  FOREIGN KEY(`questionId`) REFERENCES `Question`(`id`)
+  ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `User`;
+CREATE TABLE `User` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(256) NOT NULL,
+  `email` varchar(256) NOT NULL,
+  `status` tinyint,
+  `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `modifiedTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
