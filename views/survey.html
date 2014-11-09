@@ -12,7 +12,10 @@
 </head>
 
 <body>
-
+{%if msg %}
+<p>{{msg}}</p>
+{% endif %}
+<form method="POST" accept="/survey/{{surveyId}}" class="form-horizontal" role="form">
 {% for question in questions %}
   {% if loop.index == 1 or questions[loop.index-1].qid != questions[loop.index-2].qid %}
     {% if loop.index != 1 %}
@@ -22,21 +25,26 @@
     <div>
     <div class="radio">
       <label>
-        <input type="radio" name="question_{{questions[loop.index-1].qid}}" id="option_{{questions[loop.index-1].iid}}" value="{{questions[loop.index-1].item}}" >
+        <input type="radio" name="question_{{questions[loop.index-1].qid}}" id="option_{{questions[loop.index-1].iid}}" value="{{questions[loop.index-1].iid}}" {% if cache["question_"+questions[loop.index-1].qid] == questions[loop.index-1].iid  %}checked{% endif %} >
           {{questions[loop.index-1].item}}
       </label>
     </div>
   {% else %}
     <div class="radio">
       <label>
-        <input type="radio" name="question_{{questions[loop.index-1].qid}}" id="option_{{questions[loop.index-1].iid}}" value="{{questions[loop.index-1].item}}">
+        <input type="radio" name="question_{{questions[loop.index-1].qid}}" id="option_{{questions[loop.index-1].iid}}" value="{{questions[loop.index-1].iid}}" {% if cache["question_"+questions[loop.index-1].qid] == questions[loop.index-1].iid  %}checked{% endif %} >
           {{questions[loop.index-1].item}}
       </label>
     </div>
   {% endif %}
 {% endfor %}
 </div>
-
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">Submit</button>
+    </div>
+  </div>
+</form>
 </body>
 
 </html>

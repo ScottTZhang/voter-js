@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 //var request = require('request');
 var mysql = require('mysql');
+var async = require('async');
 var bodyparser = require('body-parser'); // request body to hash;detect name attribute in html file
 var app = express();
 
@@ -56,38 +57,107 @@ app.get('/sections', function(req, res) {// /sections is website page, and has n
 });
 
 /*  test: When select a section, show all surveys
- */
+*/
 app.get('/section/:id', function(req, res) {
   var id = req.params.id;
   var query = connection.query('SELECT * from Survey WHERE status=1 AND sectionId='+id, function(err, rows, fields) {
     if (!err) {
       console.log(rows);
       res.render('section.html', {
-       surveys : rows
+        surveys : rows
       });
     } else {
-      console.log(err);
+      res.render(err);
     }
   });
 });
 
 /*  test: When select a survey, show all questions and items from the survey
- */
-app.get('/survey/:id', function(req, res) {
+*/
+app.all('/survey/:id', function(req, res) {
   var id = req.params.id;
   var sql ='SELECT Question.id AS qid, Item.id AS iid,title,question,item from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
-  //var sql ='SELECT * from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id;';
-  var query = connection.query(sql, function(err, rows, fields) {
-    if (!err) {
-      console.log('survey ' + id);
-      console.log(rows);
-      res.render('survey.html',{
-        questions : rows
-      });
-    } else {
-      console.log(err);
+
+  if (req.method == 'GET') {
+    var query = connection.query(sql, function(err, rows, fields) {
+      if (!err) {
+        if(rows.length == 0) {
+          res.status(404).send('Survey ' + id + ' is not found');
+        } else {
+          console.log('survey ' + id);
+          //console.log(rows);
+          res.render('survey.html',{
+            questions: rows,
+            surveyId: id,
+          });
+        }
+      } else {
+        res.render(err);
+      }
+    });
+  }
+  else if (req.method == 'POST') {
+    var body = req.body;
+    console.log(body);
+    var itemIdtoUpdate =[];
+    for (var key in body) {
+      itemIdtoUpdate.push(body[key]);
     }
-  });
+
+    var cnt = 0;
+    async.series({
+      countQuestion: function(callback) {
+        connection.query('SELECT COUNT(*) as cntQuestion from Question WHERE surveyId='+id, function(err, rows, field) {
+          if (!err) {
+            if (rows.length == 0) {
+              res.status(404).send('Survey not found');
+            } else {
+              console.log(rows);
+              cnt = rows[0].cntQuestion;
+            }
+          } else {
+            res.render(err);
+          }
+          callback(null);
+        });
+      },
+      post: function(callback) {
+        console.log('cnt= ' + cnt);
+        console.log('len= ' + Object.keys(body).length);
+        if (Object.keys(body).length < cnt) {
+          var query = connection.query(sql, function(err, rows, fields) {
+            if (!err) {
+              res.render('survey.html', {
+                msg: 'you have questions unfilled',
+                cache: body,
+                questions: rows
+              });
+            } else {
+              res.render(err);
+            }
+            callback(null);
+          });
+        }
+        else {
+          var updateSql = 'UPDATE Item SET count=count+1 WHERE id IN ('+itemIdtoUpdate.join(',') + ')';
+          var query = connection.query(updateSql, function(err, rows, field) {
+            if(!err) {
+              res.redirect('/display/survey/'+id);
+            } else {
+              res.render(err);
+            }
+            callback(null);
+          });
+        }
+      }
+    });
+  }
+});
+
+app.get('/display/survey/:id', function(req, res) {
+  var id = req.params.id;
+  var successSubmit = 'submit successfully';
+  res.render('display.html');
 });
 
 /* test: When edit a item from a question in a suvey, get the item id from:
@@ -151,7 +221,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
 });
 
 /* problem: when input name is '', it should not post
- */
+*/
 app.all('/sections/add', function(req, res){
   if (req.method == 'GET') {
     res.render('add-section-form.html',{
@@ -171,8 +241,8 @@ app.all('/sections/add', function(req, res){
       });
     }
     else {
-    var msg = 'add successfully';
-    var values = '\'' + body.name + '\',\'' + body.description + '\','+ 1;
+      var msg = 'add successfully';
+      var values = '\'' + body.name + '\',\'' + body.description + '\','+ 1;
       var query = connection.query('INSERT INTO Section(name, description, status) VALUES('+values+')', function(err, rows, fields) {
         if (!err) {
           res.redirect('/sections?msge='+msg);
