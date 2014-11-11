@@ -30,7 +30,7 @@ CREATE TABLE `Survey` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(140) NOT NULL,
   `description` varchar(600) NOT NULL,
-  `status` tinyint,
+  `status` tinyint DEFAULT 1,
   `holder` varchar(40) NOT NULL,
   `sectionId` int,
   PRIMARY KEY (`id`),
@@ -42,7 +42,7 @@ DROP TABLE IF EXISTS `Question`;
 CREATE TABLE `Question` (
   `id` int NOT NULL AUTO_INCREMENT,
   `question` varchar(600) NOT NULL,
-  `status` tinyint,
+  `status` tinyint DEFAULT 1,
   `surveyId` int,
   `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `modifiedTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -55,7 +55,7 @@ DROP TABLE IF EXISTS `Item`;
 CREATE TABLE `Item` (
   `id` int NOT NULL AUTO_INCREMENT,
   `item` varchar(888) NOT NULL,
-  `status` tinyint,
+  `status` tinyint DEFAULT 1,
   `questionId` int,
   `count` int DEFAULT 0,
   `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -165,6 +165,125 @@ app.get('/display/survey/:id', function(req, res) {
 app.get('/result/:id', function(req, res) {
   var id = req.params.id;
   console.log(id);
+  res.render('result.html', {
+    id: id
+  });
+});
+
+app.all('/surveys/add', function(req, res) {
+  if (req.method == 'GET') {
+    var body = req.body;
+    res.render('add-survey-form.html');
+  }
+  else if (req.method == 'POST') {
+    var survey= {
+      title: "guess what you do",
+      description: "tell me what you see and what you use",
+      holder: "admin",
+      sectionId: 2,
+      questions: [
+        {
+        question: "what do you see most?",
+        items: [
+          "A.shit",
+          "B.poop",
+          "C.crap"
+        ]
+      },
+      {
+        question: "how do you use most?",
+        items: [
+          "A.car",
+          "B.ship",
+          "C.train"
+        ]
+      }
+      ]
+    };
+
+    var surveyId = null;
+    var questionId = null;
+    async.series({
+
+      createSurvey: function(callback) {
+        var sql = 'INSERT INTO Survey(title, description, holder, sectionId) VALUES(\''
+        + survey.title + '\',\''
+        + survey.description + '\',\''
+        + survey.holder + '\','
+        + survey.sectionId
+        + ');';
+        console.log('create survey: ' + sql);
+        var query = connection.query(sql, function(err, rows, fields) {
+          if (!err) {
+            console.log(rows);
+            surveyId = rows.insertId;
+          }
+          callback(err);
+        });
+      },
+
+      createQuestion: function(callback) {
+        //console.log(survey.questions);
+        async.eachSeries(survey.questions, function(questionHash, questionArrCallback){
+          var questionSql = 'INSERT INTO Question(question, surveyId) VALUES(\''
+          + questionHash.question + '\','
+          + surveyId
+          + ');';
+          console.log('create question: '+ questionSql);
+          async.series({
+            createQuestion: function(questionCallback) {
+              var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
+                if (!questionErr) {
+                  console.log(questionRows)
+                  questionId = questionRows.insertId;
+                }
+                questionCallback(questionErr);
+              });
+            },
+
+            createItem: function(itemArrCallback) {
+              async.eachSeries(questionHash.items, function(item, itemCallback){
+                var itemSql = 'INSERT INTO Item(item, questionId) VALUES(\''
+                + item +'\','
+                + questionId
+                + ');';
+                console.log('create item: ' + itemSql);
+                var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
+                  if (!itemErr) {
+                    //to be editted
+                    console.log('success add item');
+                  }
+                  itemCallback(itemErr);
+                  //itermArrCallback?
+                });
+              },
+              function(itemEachSeriesErr){
+                if (!itemEachSeriesErr) {
+                  console.log('all items are added successfully');
+                }
+                itemArrCallback(itemEachSeriesErr);
+              });
+            }
+          }, questionArrCallback); //end async series in createQuestion
+        },
+        function(questionEachSeriesErr){
+          if (!questionEachSeriesErr) {
+            console.log('all questions are added successfully');
+          }
+          callback(questionEachSeriesErr);
+        }); //end async eachSeries in createQuestion
+      } // end createQuestion task
+    },
+
+    function(err) {
+      if (err) {
+        res.render(err);
+      } else {
+        res.send('success page');
+      }
+    }); //end async series in POST
+
+  } //end POST
 });
 
 /* test: When edit a item from a question in a suvey, get the item id from:
@@ -194,8 +313,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
       if (!err) {
         if (rows.length > 0) {
           res.render('edit-section-form.html', {
-            data : rows[0],
-            except: undefined
+            data : rows[0]
           });
         } else {
           res.status(404).send('not found'); //if query result is empty, return 404 page
@@ -231,9 +349,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
 */
 app.all('/sections/add', function(req, res){
   if (req.method == 'GET') {
-    res.render('add-section-form.html',{
-      except : ''
-    });
+    res.render('add-section-form.html');
   }
   else if (req.method == 'POST') {
 
