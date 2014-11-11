@@ -29,9 +29,9 @@ DROP TABLE IF EXISTS `Survey`;
 CREATE TABLE `Survey` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(140) NOT NULL,
-  `description` varchar(600) NOT NULL,
+  `description` varchar(1024) NOT NULL,
   `status` tinyint DEFAULT 1,
-  `holder` varchar(40) NOT NULL,
+  `holder` varchar(100) NOT NULL,
   `sectionId` int,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`sectionId`) REFERENCES `Section`(`id`)
@@ -41,7 +41,7 @@ CREATE TABLE `Survey` (
 DROP TABLE IF EXISTS `Question`;
 CREATE TABLE `Question` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `question` varchar(600) NOT NULL,
+  `question` varchar(1024) NOT NULL,
   `status` tinyint DEFAULT 1,
   `surveyId` int,
   `createTime` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
