@@ -176,30 +176,9 @@ app.all('/surveys/add', function(req, res) {
     res.render('add-survey-form.html');
   }
   else if (req.method == 'POST') {
-    var survey= {
-      title: "guess what you do",
-      description: "tell me what you see and what you use",
-      holder: "admin",
-      sectionId: 2,
-      questions: [
-        {
-        question: "what do you see most?",
-        items: [
-          "A.shit",
-          "B.poop",
-          "C.crap"
-        ]
-      },
-      {
-        question: "how do you use most?",
-        items: [
-          "A.car",
-          "B.ship",
-          "C.train"
-        ]
-      }
-      ]
-    };
+    var body = req.body;
+    console.log(body);
+    var survey = JSON.parse(body.surveyJSON);
 
     var surveyId = null;
     var questionId = null;
