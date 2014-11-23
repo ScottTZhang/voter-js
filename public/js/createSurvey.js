@@ -3,10 +3,15 @@ $(function() {
     console.log(e.target);
     $(e.target).parent().parent().before(
         '<div class="form-group item">\
+        <div class="row">\
           <label for="forItem1" class = "col-sm-2 control-label">Item</label>\
-          <div class="col-sm-10">\
+          <div class="col-sm-8">\
             <input name="item" class="form-control" type="text" placeholder="item"/>\
           </div>\
+          <div class="col-sm-2">\
+            <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete Item</button>\
+          </div>\
+        </div>\
         </div>');
   });
 
@@ -26,9 +31,14 @@ $(function() {
           </div>\
         </div>\
         <div class="form-group item">\
-          <label for="forItem1" class = "col-sm-2 control-label">ItemA</label>\
-          <div class="col-sm-10">\
-            <input name="item" class="form-control" type="text" placeholder="item"/>\
+          <div class="row">\
+            <label for="forItem1" class = "col-sm-2 control-label">Item</label>\
+            <div class="col-sm-8">\
+              <input name="item" class="form-control" type="text" placeholder="item"/>\
+            </div>\
+            <div class="col-sm-2">\
+              <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete Item</button>\
+            </div>\
           </div>\
         </div>\
         <div class="form-group add_item">\

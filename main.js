@@ -312,7 +312,6 @@ app.all('/surveys/edit/:id', function(req, res) {
     //console.log(body);
     var survey = JSON.parse(body.surveyJSON);
     survey.sid = id;
-    console.log(survey);
     var surveyId;
 
     async.series({
@@ -331,7 +330,7 @@ app.all('/surveys/edit/:id', function(req, res) {
           + survey.sectionId
           + ');';
         }
-        console.log('create survey: ' + sql);
+        //console.log('create survey: ' + sql);
         var query = connection.query(sql, function(err, rows, fields) {
           if (!err) {
             console.log(rows);
@@ -357,12 +356,12 @@ app.all('/surveys/edit/:id', function(req, res) {
             questionSql = 'UPDATE Question SET question=\''+questionHash.question+'\' WHERE id='+questionHash.qid+';';
             questionId = questionHash.qid;
           }
-          console.log('create question: '+ questionSql);
+          //console.log('create question: '+ questionSql);
           async.series({
             createQuestion: function(questionCallback) {
               var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
                 if (!questionErr) {
-                  console.log(questionRows)
+                  //console.log(questionRows)
                   if (questionId == null)
                     questionId = questionRows.insertId;
                 }
@@ -372,7 +371,7 @@ app.all('/surveys/edit/:id', function(req, res) {
 
             createItem: function(itemArrCallback) {
               async.eachSeries(questionHash.items, function(item, itemCallback){
-                console.log(item);
+                //console.log(item);
                 var itemSql;
                 if(item.itemId==undefined || item.itemId == null) {
                   itemSql = 'INSERT INTO Item(item, questionId) VALUES(\''
@@ -382,7 +381,7 @@ app.all('/surveys/edit/:id', function(req, res) {
                 } else {
                   itemSql = 'UPDATE Item SET item=\''+item.itemVal+'\' WHERE id='+item.itemId+';';
                 }
-                console.log('create item: ' + itemSql);
+                //console.log('create item: ' + itemSql);
                 var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
                   if (!itemErr) {
                     //to be editted
