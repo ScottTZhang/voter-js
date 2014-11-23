@@ -313,7 +313,6 @@ app.all('/surveys/edit/:id', function(req, res) {
     var survey = JSON.parse(body.surveyJSON);
     survey.sid = id;
     console.log(survey);
-    var questionId;
     var surveyId;
 
     async.series({
@@ -324,6 +323,7 @@ app.all('/surveys/edit/:id', function(req, res) {
           sql = 'UPDATE Survey SET title=\''+survey.title+'\', description=\''+survey.description+'\' WHERE id='+id+';';
           surveyId = id;
         } else {
+          surveyId = null;
           sql = 'INSERT INTO Survey(title, description, holder, sectionId) VALUES(\''
           + survey.title + '\',\''
           + survey.description + '\',\''
@@ -335,7 +335,7 @@ app.all('/surveys/edit/:id', function(req, res) {
         var query = connection.query(sql, function(err, rows, fields) {
           if (!err) {
             console.log(rows);
-            if(surveyId == undefined)
+            if(surveyId == null)
               surveyId = rows.insertId;
           }
           callback(err);
@@ -346,7 +346,9 @@ app.all('/surveys/edit/:id', function(req, res) {
         //console.log(survey.questions);
         async.eachSeries(survey.questions, function(questionHash, questionArrCallback){
           var questionSql;
+          var questionId;
           if (questionHash.qid == null || questionHash.qid == undefined) {
+            questionId = null;
             questionSql = 'INSERT INTO Question(question, surveyId) VALUES(\''
             + questionHash.question + '\','
             + surveyId
@@ -361,7 +363,7 @@ app.all('/surveys/edit/:id', function(req, res) {
               var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
                 if (!questionErr) {
                   console.log(questionRows)
-                  if (questionId == undefined)
+                  if (questionId == null)
                     questionId = questionRows.insertId;
                 }
                 questionCallback(questionErr);

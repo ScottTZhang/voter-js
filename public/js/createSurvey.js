@@ -10,6 +10,11 @@ $(function() {
         </div>');
   });
 
+  //$(document).on("click", ".delete_item_class",function(e) {
+    //console.log($(this).closest('.item'));
+    //$(this).closest('.item').remove();
+  //}
+
   $("#add_question_btn").click(function() {
     $(".add_question").before(
       '<div class="question">\
