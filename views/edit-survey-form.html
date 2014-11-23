@@ -48,9 +48,14 @@
             <div class="question">
               <div class="form-group">
                 </br>
-                <label for="forQuestion" class = "col-sm-2 control-label">Question</label>
-                <div class="col-sm-10">
-                  <input name="question" class="form-control" type="text" placeholder="Describe your question" value="{{data[loop.index-1].question}}" data-id="{{data[loop.index-1].qid}}"/>
+                <div class="row">
+                  <label for="forQuestion" class = "col-sm-2 control-label">Question</label>
+                  <div class="col-sm-8">
+                    <input name="question" class="form-control" type="text" placeholder="Describe your question" value="{{data[loop.index-1].question}}" data-id="{{data[loop.index-1].qid}}" data-delete/>
+                  </div>
+                  <div class="col-sm-2">
+                    <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete Question</button>
+                  </div>
                 </div>
               </div>
 

@@ -353,7 +353,11 @@ app.all('/surveys/edit/:id', function(req, res) {
             + surveyId
             + ');';
           } else {
-            questionSql = 'UPDATE Question SET question=\''+questionHash.question+'\' WHERE id='+questionHash.qid+';';
+            if (questionHash.qDelete == '1') {
+              questionSql = 'UPDATE Question SET status=0 WHERE id='+questionHash.qid+';';
+            } else {
+              questionSql = 'UPDATE Question SET question=\''+questionHash.question+'\' WHERE id='+questionHash.qid+';';
+            }
             questionId = questionHash.qid;
           }
           //console.log('create question: '+ questionSql);

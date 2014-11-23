@@ -15,6 +15,21 @@ $(function() {
         </div>');
   });
 
+  $(document).on("click", ".delete_question_class", function(e) {
+    var questionInputArr = $(this).closest('.question').find('input');
+    console.log(questionInputArr[0].dataset);
+    questionInputArr[0].dataset.delete = 1;
+    console.log(questionInputArr[0].dataset);
+    if (questionInputArr[0].dataset.id == null) {
+      $(this).closest('.question').remove();
+    } else {
+      for (var i = 1; i < questionInputArr.length; i++) {
+        questionInputArr[i].dataset.delete = 1;
+      }
+      $(this).closest('.question').hide();
+    }
+  });
+
   $(document).on("click", ".delete_item_class",function(e) {
     var itemInput = $(this).parent().prev().find('input')[0];
     console.log(itemInput.dataset);
@@ -33,16 +48,21 @@ $(function() {
       '<div class="question">\
         <div class="form-group">\
           </br>\
-          <label for="forQuestion1" class = "col-sm-2 control-label">Question</label>\
-          <div class="col-sm-10">\
-            <input name="question" class="form-control" type="text" placeholder="Describe your question"/>\
+          <div class="row">\
+            <label for="forQuestion1" class = "col-sm-2 control-label">Question</label>\
+            <div class="col-sm-8">\
+              <input name="question" class="form-control" type="text" placeholder="Describe your question" data-delete/>\
+            </div>\
+            <div class="col-sm-2">\
+              <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete Question</button>\
+            </div>\
           </div>\
         </div>\
         <div class="form-group item">\
           <div class="row">\
             <label for="forItem1" class = "col-sm-2 control-label">Item</label>\
             <div class="col-sm-8">\
-              <input name="item" class="form-control" type="text" placeholder="item"/>\
+              <input name="item" class="form-control" type="text" placeholder="item" data-delete/>\
             </div>\
             <div class="col-sm-2">\
               <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete Item</button>\
@@ -79,6 +99,7 @@ $(function() {
       } else {
         q.qid = parseInt(qId);
       }
+      q.qDelete = arr[0].dataset.delete;
 
       var is = [];
       for (var j = 1; j < arr.length; j++) {
