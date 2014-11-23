@@ -15,10 +15,18 @@ $(function() {
         </div>');
   });
 
-  //$(document).on("click", ".delete_item_class",function(e) {
-    //console.log($(this).closest('.item'));
-    //$(this).closest('.item').remove();
-  //}
+  $(document).on("click", ".delete_item_class",function(e) {
+    var itemInput = $(this).parent().prev().find('input')[0];
+    console.log(itemInput.dataset);
+    itemInput.dataset.delete = 1;
+    console.log(itemInput.dataset);
+    console.log($(this).closest('.item'));
+    if (itemInput.dataset.id) {
+      $(this).closest('.item').hide();
+    } else {
+      $(this).closest('.item').remove();
+    }
+  });
 
   $("#add_question_btn").click(function() {
     $(".add_question").before(
@@ -81,6 +89,7 @@ $(function() {
         } else {
           it.itemId = parseInt(iId);
         }
+        it.itemDelete = arr[j].dataset.delete;
         it.itemVal = arr[j].value;
         is.push(it);
       }

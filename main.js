@@ -44,7 +44,7 @@ app.get('/sections', function(req, res) {// /sections is website page, and has n
   connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
 
     if (!err) {
-      console.log(rows);
+      //console.log(rows);
       res.render('sections.html', {
         data : rows,
         message : msg
@@ -290,7 +290,7 @@ app.all('/surveys/edit/:id', function(req, res) {
   var id = req.params.id;
 
   if ( req.method == 'GET') {
-    var sql ='SELECT Survey.id AS sid, Survey.title AS stitle, Survey.description as sdesc, Question.id AS qid, question, Item.id AS iid, item from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
+    var sql ='SELECT Survey.id AS sid, Survey.title AS stitle, Survey.description as sdesc, Question.id AS qid, question, Item.id AS iid, item from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.status=1 And Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
     var query = connection.query(sql, function(err, rows, fields) {
       if (!err) {
         if(rows.length == 0) {
@@ -309,7 +309,7 @@ app.all('/surveys/edit/:id', function(req, res) {
   }
   else if (req.method == 'POST') {
     var body = req.body;
-    //console.log(body);
+    console.log(body);
     var survey = JSON.parse(body.surveyJSON);
     survey.sid = id;
     var surveyId;
@@ -371,15 +371,20 @@ app.all('/surveys/edit/:id', function(req, res) {
 
             createItem: function(itemArrCallback) {
               async.eachSeries(questionHash.items, function(item, itemCallback){
-                //console.log(item);
+                console.log(item);
                 var itemSql;
+
                 if(item.itemId==undefined || item.itemId == null) {
                   itemSql = 'INSERT INTO Item(item, questionId) VALUES(\''
                   + item.itemVal +'\','
                   + questionId
                   + ');';
                 } else {
-                  itemSql = 'UPDATE Item SET item=\''+item.itemVal+'\' WHERE id='+item.itemId+';';
+                  if (item.itemDelete == '1') {
+                    itemSql = 'UPDATE Item SET status=0 WHERE id='+item.itemId+';';
+                  } else {
+                    itemSql = 'UPDATE Item SET item=\''+item.itemVal+'\' WHERE id='+item.itemId+';';
+                  }
                 }
                 //console.log('create item: ' + itemSql);
                 var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
