@@ -35,6 +35,56 @@ $(function() {
 
   });
 
+  $("#edit_survey_btn").click(function() {
+    var survey = {};
+    survey.holder = "admin";
+    survey.sectionId = 2;
+
+    survey.title=$("#forName").val();
+    survey.description=$("#forDescription").val();
+
+    var qs = [];
+    var questions = $(".question");
+    for (var i = 0; i < questions.length; i++) {
+      var arr = $(questions[i]).find("input");
+
+      var q = {};
+      q.question = arr[0].value;
+      var qId = arr[0].dataset.id;
+      if (qId == undefined) {
+        q.qid = undefined;
+      } else {
+        q.qid = parseInt(qId);
+      }
+
+      var is = [];
+      for (var j = 1; j < arr.length; j++) {
+        var it = {};
+        var iId = arr[j].dataset.id;
+        if (iId == undefined) {
+          it.itemId = undefined;
+        } else {
+          it.itemId = parseInt(iId);
+        }
+        it.itemVal = arr[j].value;
+        is.push(it);
+      }
+      q.items = is;
+      qs.push(q);
+    }
+
+    survey.questions = qs;
+
+    console.log(survey);
+
+    surveyJson = JSON.stringify(survey);
+
+    $.post(document.URL, {surveyJSON: surveyJson}, function(data) {
+      console.log("what is this? " + data);
+      window.location.href = "/sections";
+    });
+  });
+
   $("#create_survey_btn").click(function() {
     var survey = {};
     survey.holder = "admin";

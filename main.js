@@ -92,7 +92,7 @@ app.all('/survey/:id', function(req, res) {
           });
         }
       } else {
-        res.render(err);
+        res.send(err);
       }
     });
   }
@@ -283,6 +283,139 @@ app.get('/section/delete/:id', function(req, res) {
     }
   });
   console.log(query.sql);
+});
+
+//edit a survey based on id
+app.all('/surveys/edit/:id', function(req, res) {
+  var id = req.params.id;
+
+  if ( req.method == 'GET') {
+    var sql ='SELECT Survey.id AS sid, Survey.title AS stitle, Survey.description as sdesc, Question.id AS qid, question, Item.id AS iid, item from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
+    var query = connection.query(sql, function(err, rows, fields) {
+      if (!err) {
+        if(rows.length == 0) {
+          res.status(404).send('Survey ' + id + ' is not found');
+        } else {
+          console.log(rows);
+          res.render('edit-survey-form.html',{
+            data: rows,
+            surveyId: id,
+          });
+        }
+      } else {
+        res.send(err);
+      }
+    });
+  }
+  else if (req.method == 'POST') {
+    var body = req.body;
+    //console.log(body);
+    var survey = JSON.parse(body.surveyJSON);
+    survey.sid = id;
+    console.log(survey);
+    var questionId;
+    var surveyId;
+
+    async.series({
+
+      createSurvey: function(callback) {
+        var sql;
+        if (survey.sid) {
+          sql = 'UPDATE Survey SET title=\''+survey.title+'\', description=\''+survey.description+'\' WHERE id='+id+';';
+          surveyId = id;
+        } else {
+          sql = 'INSERT INTO Survey(title, description, holder, sectionId) VALUES(\''
+          + survey.title + '\',\''
+          + survey.description + '\',\''
+          + survey.holder + '\','
+          + survey.sectionId
+          + ');';
+        }
+        console.log('create survey: ' + sql);
+        var query = connection.query(sql, function(err, rows, fields) {
+          if (!err) {
+            console.log(rows);
+            if(surveyId == undefined)
+              surveyId = rows.insertId;
+          }
+          callback(err);
+        });
+      },
+
+      createQuestion: function(callback) {
+        //console.log(survey.questions);
+        async.eachSeries(survey.questions, function(questionHash, questionArrCallback){
+          var questionSql;
+          if (questionHash.qid == null || questionHash.qid == undefined) {
+            questionSql = 'INSERT INTO Question(question, surveyId) VALUES(\''
+            + questionHash.question + '\','
+            + surveyId
+            + ');';
+          } else {
+            questionSql = 'UPDATE Question SET question=\''+questionHash.question+'\' WHERE id='+questionHash.qid+';';
+            questionId = questionHash.qid;
+          }
+          console.log('create question: '+ questionSql);
+          async.series({
+            createQuestion: function(questionCallback) {
+              var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
+                if (!questionErr) {
+                  console.log(questionRows)
+                  if (questionId == undefined)
+                    questionId = questionRows.insertId;
+                }
+                questionCallback(questionErr);
+              });
+            },
+
+            createItem: function(itemArrCallback) {
+              async.eachSeries(questionHash.items, function(item, itemCallback){
+                console.log(item);
+                var itemSql;
+                if(item.itemId==undefined || item.itemId == null) {
+                  itemSql = 'INSERT INTO Item(item, questionId) VALUES(\''
+                  + item.itemVal +'\','
+                  + questionId
+                  + ');';
+                } else {
+                  itemSql = 'UPDATE Item SET item=\''+item.itemVal+'\' WHERE id='+item.itemId+';';
+                }
+                console.log('create item: ' + itemSql);
+                var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
+                  if (!itemErr) {
+                    //to be editted
+                    console.log('success add item');
+                  }
+                  itemCallback(itemErr);
+                  //itermArrCallback?
+                });
+              },
+              function(itemEachSeriesErr){
+                if (!itemEachSeriesErr) {
+                  console.log('all items are added successfully');
+                }
+                itemArrCallback(itemEachSeriesErr);
+              });
+            }
+          }, questionArrCallback); //end async series in createQuestion
+        },
+        function(questionEachSeriesErr){
+          if (!questionEachSeriesErr) {
+            console.log('all questions are added successfully');
+          }
+          callback(questionEachSeriesErr);
+        }); //end async eachSeries in createQuestion
+      } // end createQuestion task
+    },
+
+    function(err) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send('success page');
+      }
+    }); //end async series in POST
+  }
 });
 
 app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in this part of url is called 'id'
