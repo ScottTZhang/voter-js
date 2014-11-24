@@ -352,7 +352,7 @@ app.all('/surveys/edit/:id', function(req, res) {
   }
   else if (req.method == 'POST') {
     var body = req.body;
-    console.log(body);
+    //console.log(body);
     var survey = JSON.parse(body.surveyJSON);
     survey.sid = id;
     var surveyId;
@@ -361,12 +361,18 @@ app.all('/surveys/edit/:id', function(req, res) {
     var hasErr = false;
     if (survey.title =='' || survey.title==null) {
       survey.titleExcept='Please fill in title.';
-      hashErr = true;
+      hasErr = true;
     }
     else{
       var cntQuestion = survey.questions.length;
+      for (var index = 0; index < survey.questions.length; index++) {
+        if (survey.questions[index].qDelete == '1')
+          cntQuestion--;
+      }
+      console.log('questions cnt: ' + cntQuestion);
       if (cntQuestion < 1 || cntQuestion > 10) {
         survey.cntQuestionExcept = 'Question amount between 1 and 10.';
+        hasErr = true;
       }
       for (var i = 0; i < survey.questions.length; i++) {
         var q = survey.questions[i];
@@ -376,6 +382,11 @@ app.all('/surveys/edit/:id', function(req, res) {
         }
 
         var cntItem = q.items.length;
+        for (var index = 0; index < q.items.length; index++) {
+          if (q.items[index].itemDelete == '1')
+            cntItem--;
+        }
+        console.log('item cnt: ' + cntItem);
         if (cntItem < 2 || cntItem > 10) {
           survey.questions[i].cntItemExcept = 'Item amount between 2 and 10.';
           hasErr = true;
@@ -392,7 +403,7 @@ app.all('/surveys/edit/:id', function(req, res) {
     console.log(hasErr);
     //console.log(survey);
     var flattenedSurvey = flattenSurvey(survey);
-    console.log(flattenedSurvey);
+    //console.log(flattenedSurvey);
     if(hasErr) {
       res.render('edit-survey-form.html', {
         data : flattenedSurvey,

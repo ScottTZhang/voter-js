@@ -22,16 +22,15 @@ $(function() {
 
   $(document).on("click", ".delete_question_class", function(e) {
     var questionInputArr = $(this).closest('.question').find('input');
-    console.log(questionInputArr[0].dataset);
+    console.log(questionInputArr[0]);
     questionInputArr[0].dataset.delete = 1;
     console.log(questionInputArr[0].dataset);
-    if (questionInputArr[0].dataset.id == null) {
+    if (questionInputArr[0].dataset.id == '') {
       $(this).closest('.question').remove();
+      console.log('question removed');
     } else {
-      for (var i = 1; i < questionInputArr.length; i++) {
-        questionInputArr[i].dataset.delete = 1;
-      }
       $(this).closest('.question').hide();
+      console.log('question hidden');
     }
   });
 
@@ -43,8 +42,10 @@ $(function() {
     console.log($(this).closest('.item'));
     if (itemInput.dataset.id) {
       $(this).closest('.item').hide();
+      console.log('item hidden');
     } else {
       $(this).closest('.item').remove();
+      console.log('item removed');
     }
   });
 
@@ -56,7 +57,7 @@ $(function() {
           <div class="row">\
             <label for="forQuestion1" class = "col-sm-2 control-label">Question</label>\
             <div class="col-sm-8">\
-              <input name="question" class="form-control" type="text" placeholder="Describe your question" data-delete/>\
+              <input name="question" class="form-control" type="text" placeholder="Describe your question" data-id data-delete/>\
             </div>\
             <div class="col-sm-2">\
               <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete Question</button>\
@@ -67,7 +68,7 @@ $(function() {
           <div class="row">\
             <label for="forItem1" class = "col-sm-2 control-label">Item</label>\
             <div class="col-sm-8">\
-              <input name="item" class="form-control" type="text" placeholder="item" data-delete/>\
+              <input name="item" class="form-control" type="text" placeholder="item" data-delete data-id/>\
             </div>\
             <div class="col-sm-2">\
               <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete Item</button>\
