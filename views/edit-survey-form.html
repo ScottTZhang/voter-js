@@ -21,28 +21,28 @@
       <h1>Edit a Survey</h1>
       <p>Here you can edit your survey.</p>
       {% if msg %}
-        <div class="alert alert-warning" role="alert">{{msg}}</div>
+        <div class="alert alert-danger" role="alert">{{msg}}</div>
       {% endif %}
       <form class="form-horizontal" role="form">
-        <div class="form-group form-group-lg {% if data[0].titleExcept or data[0].cntQuestionExcept %}has-error{% endif %}">
+        <div class="form-group form-group-lg {% if data[0].titleExcept %}has-error{% endif %}">
           <label for="forName" class="col-sm-2 control-label">Survey Title</label>
           <div class="col-sm-10">
             <input name="name" class="form-control input-lg" type="text" id="forName" placeholder="Create a title here" value="{{data[0].stitle}}"/>
+            {% if data[0].titleExcept %}
+              <span id="helpBlock" class="help-block">{{data[0].titleExcept}}</span>
+            {% endif %}
           </div>
         </div>
-        {% if data[0].titleExcept %}
-        <span id="helpBlock" class="help-block">{{data[0].titleExcept}}</span>
-        {% endif %}
 
-        <div class="form-group">
+        <div class="form-group {%if data[0].cntQuestionExcept %}has-error{%endif%} " >
           <label for="forDescription" class="col-sm-2 control-label">Description</label>
           <div class="col-sm-10">
             <textarea id="forDescription" name="description" class="form-control" placeholder="Description" rows="3">{{data[0].sdesc}}</textarea>
+          {% if data[0].cntQuestionExcept %}
+            <span id="helpBlock" class="help-block">{{data[0].cntQuestionExcept}}</span>
+          {% endif %}
           </div>
         </div>
-        {% if data[0].cntQuestionExcept %}
-        <span id="helpBlock" class="help-block">{{data[0].cntQuestionExcept}}</span>
-        {% endif %}
 
         {% for question in data %}
           {% if loop.index == 1 or data[loop.index - 1].qid != data[loop.index - 2].qid %}
@@ -57,36 +57,32 @@
             <div class="question">
               <div class="form-group {% if data[loop.index-1].questionExcept or data[loop.index-1].cntItemExcept %}has-error{% endif %}">
                 </br>
-                <div class="row">
                   <label for="forQuestion" class = "col-sm-2 control-label">Question</label>
                   <div class="col-sm-8">
-                    <input name="question" class="form-control" type="text" placeholder="Describe your question" value="{{data[loop.index-1].question}}" data-id="{{data[loop.index-1].qid}}" data-delete/>
+                    <input name="question" class="form-control" type="text" placeholder="Describe your question" value="{{data[loop.index-1].question}}" data-id="{{data[loop.index-1].qid}}" data-delete='0'/>
+                    {% if data[loop.index-1].questionExcept %}
+                      <span id="helpBlock" class="help-block">{{data[loop.index-1].questionExcept}}</span>
+                    {% endif %}
+                    {% if data[loop.index-1].cntItemExcept %}
+                      <span id="helpBlock" class="help-block">{{data[loop.index-1].cntItemExcept}}</span>
+                    {% endif %}
                   </div>
                   <div class="col-sm-2">
-                    <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete Question</button>
+                    <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete</button>
                   </div>
-                </div>
-                {% if data[loop.index-1].questionExcept %}
-                  <span id="helpBlock" class="help-block">{{data[loop.index-1].questionExcept}}</span>
-                {% endif %}
-                {% if data[loop.index-1].cntItemExcept %}
-                  <span id="helpBlock" class="help-block">{{data[loop.index-1].cntItemExcept}}</span>
-                {% endif %}
               </div>
 
               <div class="form-group item {% if data[loop.index-1].itemExcept %}has-error{% endif %}">
-                <div class="row">
-                  <label for="forItem1" class = "col-sm-2 control-label">Item</label>
-                  <div class="col-sm-8">
-                    <input name="item" class="form-control" type="text" placeholder="item" value="{{data[loop.index-1].item}}" data-id="{{data[loop.index-1].iid}}" data-delete/>
-                  </div>
-                  <div class="col-sm-2">
-                    <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete Item</button>
-                  </div>
+                <label for="forItem1" class = "col-sm-2 control-label">Item</label>
+                <div class="col-sm-8">
+                  <input name="item" class="form-control" type="text" placeholder="item" value="{{data[loop.index-1].item}}" data-id="{{data[loop.index-1].iid}}" data-delete/>
+                  {% if data[loop.index-1].itemExcept %}
+                  <span id="helpBlock" class="help-block">{{data[loop.index-1].itemExcept}}</span>
+                  {% endif %}
                 </div>
-                {% if data[loop.index-1].itemExcept %}
-                <span id="helpBlock" class="help-block">{{data[loop.index-1].itemExcept}}</span>
-                {% endif %}
+                <div class="col-sm-2">
+                  <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>
+                </div>
               </div>
             {% if loop.index == loop.length %}
               <div class="form-group add_item">
@@ -98,18 +94,16 @@
             {% endif %}
           {% else %}
             <div class="form-group item {% if data[loop.index-1].itemExcept %}has-error{% endif %}">
-              <div class="row">
-                <label for="forItem1" class = "col-sm-2 control-label">Item</label>
-                <div class="col-sm-8">
-                  <input name="item" class="form-control" type="text" placeholder="item" value="{{data[loop.index-1].item}}" data-id="{{data[loop.index-1].iid}}" data-delete/>
-                </div>
-                <div class="col-sm-2">
-                  <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete Item</button>
-                </div>
+              <label for="forItem1" class = "col-sm-2 control-label">Item</label>
+              <div class="col-sm-8">
+                <input name="item" class="form-control" type="text" placeholder="item" value="{{data[loop.index-1].item}}" data-id="{{data[loop.index-1].iid}}" data-delete/>
+                {% if data[loop.index-1].itemExcept%}
+                  <span id="helpBlock" class="help-block">{{data[loop.index-1].itemExcept}}</span>
+                {% endif %}
               </div>
-              {% if data[loop.index-1].itemExcept%}
-                <span id="helpBlock" class="help-block">{{data[loop.index-1].itemExcept}}</span>
-              {% endif %}
+              <div class="col-sm-2">
+                <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>
+              </div>
             </div>
             {% if loop.index == loop.length %}
                 <div class="form-group add_item">
@@ -122,7 +116,6 @@
             {% endif %}
           {% endif %}
         {% endfor %}
-
 
         <div class="form-group add_question">
           </br>
