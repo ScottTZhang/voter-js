@@ -1,4 +1,9 @@
 $(function() {
+
+  $(document).ready(function(){
+        $(this).scrollTop(0);
+  });
+
   $(document).on("click", ".add_item_class", function(e) {
     console.log(e.target);
     $(e.target).parent().parent().before(
@@ -83,8 +88,8 @@ $(function() {
     survey.holder = "admin";
     survey.sectionId = 2;
 
-    survey.title=$("#forName").val();
-    survey.description=$("#forDescription").val();
+    survey.title=$("#forName").val().trim();
+    survey.description=$("#forDescription").val().trim();
 
     var qs = [];
     var questions = $(".question");
@@ -92,10 +97,10 @@ $(function() {
       var arr = $(questions[i]).find("input");
 
       var q = {};
-      q.question = arr[0].value;
+      q.question = arr[0].value.trim();;
       var qId = arr[0].dataset.id;
       if (qId == undefined) {
-        q.qid = undefined;
+        q.qid = null;
       } else {
         q.qid = parseInt(qId);
       }
@@ -106,12 +111,12 @@ $(function() {
         var it = {};
         var iId = arr[j].dataset.id;
         if (iId == undefined) {
-          it.itemId = undefined;
+          it.itemId = null;
         } else {
           it.itemId = parseInt(iId);
         }
         it.itemDelete = arr[j].dataset.delete;
-        it.itemVal = arr[j].value;
+        it.itemVal = arr[j].value.trim();
         is.push(it);
       }
       q.items = is;
@@ -125,8 +130,13 @@ $(function() {
     surveyJson = JSON.stringify(survey);
 
     $.post(document.URL, {surveyJSON: surveyJson}, function(data) {
-      console.log("what is this? " + data);
-      window.location.href = "/sections";
+      if (data == 'success page') {
+        window.location.href = "/sections";
+      } else {
+        document.open();
+        document.write(data);
+        document.close();
+      }
     });
   });
 
