@@ -7,6 +7,13 @@ var async = require('async');
 var bodyparser = require('body-parser'); // request body to hash;detect name attribute in html file
 var app = express();
 
+//configuration values
+var MIN_ITEM_AMOUNT = 2;
+var MAX_ITEM_AMOUNT = 10;
+var MIN_QUESTION_AMOUNT = 1;
+var MAX_QUESTION_AMOUNT = 10;
+var STATUS_DELETE = '1';
+
 app.use(bodyparser.urlencoded({
   extended:true
 }));
@@ -44,7 +51,6 @@ app.get('/sections', function(req, res) {// /sections is website page, and has n
   connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
 
     if (!err) {
-      //console.log(rows);
       res.render('sections.html', {
         data : rows,
         message : msg
@@ -62,7 +68,6 @@ app.get('/section/:id', function(req, res) {
   var id = req.params.id;
   var query = connection.query('SELECT * from Survey WHERE status=1 AND sectionId='+id, function(err, rows, fields) {
     if (!err) {
-      console.log(rows);
       res.render('section.html', {
         surveys : rows
       });
@@ -84,8 +89,6 @@ app.all('/survey/:id', function(req, res) {
         if(rows.length == 0) {
           res.status(404).send('Survey ' + id + ' is not found');
         } else {
-          console.log('survey ' + id);
-          //console.log(rows);
           res.render('survey.html',{
             questions: rows,
             surveyId: id,
@@ -98,7 +101,6 @@ app.all('/survey/:id', function(req, res) {
   }
   else if (req.method == 'POST') {
     var body = req.body;
-    console.log(body);
     var itemIdtoUpdate =[];
     for (var key in body) {
       itemIdtoUpdate.push(body[key]);
@@ -121,8 +123,6 @@ app.all('/survey/:id', function(req, res) {
         });
       },
       post: function(callback) {
-        console.log('cnt= ' + cnt);
-        console.log('len= ' + Object.keys(body).length);
         if (Object.keys(body).length < cnt) {
           var query = connection.query(sql, function(err, rows, fields) {
             if (!err) {
@@ -164,7 +164,6 @@ app.get('/display/survey/:id', function(req, res) {
 
 app.get('/result/:id', function(req, res) {
   var id = req.params.id;
-  console.log(id);
   res.render('result.html', {
     id: id
   });
@@ -177,91 +176,120 @@ app.all('/surveys/add', function(req, res) {
   }
   else if (req.method == 'POST') {
     var body = req.body;
-    console.log(body);
     var survey = JSON.parse(body.surveyJSON);
-
     var surveyId = null;
     var questionId = null;
-    async.series({
 
-      createSurvey: function(callback) {
-        var sql = 'INSERT INTO Survey(title, description, holder, sectionId) VALUES(\''
-        + survey.title + '\',\''
-        + survey.description + '\',\''
-        + survey.holder + '\','
-        + survey.sectionId
-        + ');';
-        console.log('create survey: ' + sql);
-        var query = connection.query(sql, function(err, rows, fields) {
-          if (!err) {
-            console.log(rows);
-            surveyId = rows.insertId;
+    //validation part
+    var hasErr = false;
+    if (survey.stitle =='' || survey.stitle==null) {
+      survey.titleExcept='Please fill in title.';
+      hasErr = true;
+    }
+    else{
+      var cntQuestion = survey.questions.length;
+      if (cntQuestion < MIN_QUESTION_AMOUNT || cntQuestion > MAX_QUESTION_AMOUNT) {
+        survey.cntQuestionExcept = 'Question amount between 1 and 10.';
+        hasErr = true;
+      }
+      for (var i = 0; i < survey.questions.length; i++) {
+        var q = survey.questions[i];
+        if ((q.question == '' || q.question == null)) {
+          survey.questions[i].questionExcept = 'Please fill in question.';
+          hasErr = true;
+        }
+
+        var cntItem = q.items.length;
+        if (cntItem < MIN_ITEM_AMOUNT || cntItem > MAX_ITEM_AMOUNT) {
+          survey.questions[i].cntItemExcept = 'Item amount between 2 and 10.';
+          hasErr = true;
+        }
+        for (var j = 0; j < q.items.length; j++) {
+          var it = q.items[j];
+          if ((it.item == '' || it.item==null)) {
+            survey.questions[i].items[j].itemExcept = 'Please fill in item.';
+            hasErr = true;
           }
-          callback(err);
-        });
-      },
+        }
+      }
+    }
 
-      createQuestion: function(callback) {
-        //console.log(survey.questions);
-        async.eachSeries(survey.questions, function(questionHash, questionArrCallback){
-          var questionSql = 'INSERT INTO Question(question, surveyId) VALUES(\''
-          + questionHash.question + '\','
-          + surveyId
+    if(hasErr) {
+      return res.render('add-survey-form.html', {data: survey, msg: "Some input errors"});
+    }
+    else {
+      async.series({
+        createSurvey: function(callback) {
+          var sql = 'INSERT INTO Survey(title, description, holder, sectionId) VALUES(\''
+          + survey.stitle + '\',\''
+          + survey.sdesc + '\',\''
+          + survey.holder + '\','
+          + survey.sectionId
           + ');';
-          console.log('create question: '+ questionSql);
-          async.series({
-            createQuestion: function(questionCallback) {
-              var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
-                if (!questionErr) {
-                  console.log(questionRows)
-                  questionId = questionRows.insertId;
-                }
-                questionCallback(questionErr);
-              });
-            },
+          var query = connection.query(sql, function(err, rows, fields) {
+            if (!err) {
+              surveyId = rows.insertId;
+            }
+            callback(err);
+          });
+        },
 
-            createItem: function(itemArrCallback) {
-              async.eachSeries(questionHash.items, function(item, itemCallback){
-                var itemSql = 'INSERT INTO Item(item, questionId) VALUES(\''
-                + item +'\','
-                + questionId
-                + ');';
-                console.log('create item: ' + itemSql);
-                var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
-                  if (!itemErr) {
-                    //to be editted
-                    console.log('success add item');
+        createQuestion: function(callback) {
+          async.eachSeries(survey.questions, function(questionHash, questionArrCallback){
+            var questionSql = 'INSERT INTO Question(question, surveyId) VALUES(\''
+            + questionHash.question + '\','
+            + surveyId
+            + ');';
+            async.series({
+              createQuestion: function(questionCallback) {
+                var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
+                  if (!questionErr) {
+                    questionId = questionRows.insertId;
                   }
-                  itemCallback(itemErr);
-                  //itermArrCallback?
+                  questionCallback(questionErr);
                 });
               },
-              function(itemEachSeriesErr){
-                if (!itemEachSeriesErr) {
-                  console.log('all items are added successfully');
-                }
-                itemArrCallback(itemEachSeriesErr);
-              });
+
+              createItem: function(itemArrCallback) {
+                async.eachSeries(questionHash.items, function(item, itemCallback){
+                  var itemSql = 'INSERT INTO Item(item, questionId) VALUES(\''
+                  + item.item +'\','
+                  + questionId
+                  + ');';
+                  var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
+                    if (!itemErr) {
+                      //to be editted
+                      console.log('success add item');
+                    }
+                    itemCallback(itemErr);
+                  });
+                },
+                function(itemEachSeriesErr){
+                  if (!itemEachSeriesErr) {
+                    console.log('all items are added successfully');
+                  }
+                  itemArrCallback(itemEachSeriesErr);
+                });
+              }
+            }, questionArrCallback); //end async series in createQuestion
+          },
+          function(questionEachSeriesErr){
+            if (!questionEachSeriesErr) {
+              console.log('all questions are added successfully');
             }
-          }, questionArrCallback); //end async series in createQuestion
-        },
-        function(questionEachSeriesErr){
-          if (!questionEachSeriesErr) {
-            console.log('all questions are added successfully');
-          }
-          callback(questionEachSeriesErr);
-        }); //end async eachSeries in createQuestion
-      } // end createQuestion task
-    },
+            callback(questionEachSeriesErr);
+          }); //end async eachSeries in createQuestion
+        } // end createQuestion task
+      },
 
-    function(err) {
-      if (err) {
-        res.render(err);
-      } else {
-        res.send('success page');
-      }
-    }); //end async series in POST
-
+      function(err) {
+        if (err) {
+          res.render(err);
+        } else {
+          res.send('success page');
+        }
+      }); //end async series in POST
+    }
   } //end POST
 });
 
@@ -282,8 +310,46 @@ app.get('/section/delete/:id', function(req, res) {
       res.render(err);
     }
   });
-  console.log(query.sql);
 });
+
+function hashfyQuery(rows) {
+  var res = {};
+  res.sid = rows[0].sid;//surveyId
+  res.stitle = rows[0].stitle;
+  res.sdesc = rows[0].sdesc;
+  res.holder = 'admin'; //to be changed
+  res.sectionId = 2;//to be changed
+  res.titleExcept = null;
+  res.cntQuestionExcept = null;
+
+  var questions = [];
+  for (var i = 0; i < rows.length; i++) {
+    if (i == 0 || rows[i].qid != rows[i - 1].qid) {
+      var q = {};
+      q.qid = rows[i].qid;
+      q.question = rows[i].question;
+      q.items = [];
+      q.questionExcept = null;
+      q.cntItemExcept = null;
+
+      var it = {};
+      it.iid = rows[i].iid;
+      it.item = rows[i].item;
+      q.items.push(it);
+
+      questions.push(q);
+    } else {
+      var q = questions[questions.length - 1];
+      var it = {};
+      it.iid = rows[i].iid;
+      it.item = rows[i].item;
+      it.itemExcept = null;
+      q.items.push(it);
+    }
+  }
+  res.questions = questions;
+  return res;
+}
 
 //edit a survey based on id
 app.all('/surveys/edit/:id', function(req, res) {
@@ -296,10 +362,9 @@ app.all('/surveys/edit/:id', function(req, res) {
         if(rows.length == 0) {
           res.status(404).send('Survey ' + id + ' is not found');
         } else {
-          console.log(rows);
+          var hashedRows = hashfyQuery(rows);
           res.render('edit-survey-form.html',{
-            data: rows,
-            surveyId: id,
+            data: hashedRows
           });
         }
       } else {
@@ -309,122 +374,159 @@ app.all('/surveys/edit/:id', function(req, res) {
   }
   else if (req.method == 'POST') {
     var body = req.body;
-    console.log(body);
     var survey = JSON.parse(body.surveyJSON);
     survey.sid = id;
     var surveyId;
 
-    async.series({
-
-      createSurvey: function(callback) {
-        var sql;
-        if (survey.sid) {
-          sql = 'UPDATE Survey SET title=\''+survey.title+'\', description=\''+survey.description+'\' WHERE id='+id+';';
-          surveyId = id;
-        } else {
-          surveyId = null;
-          sql = 'INSERT INTO Survey(title, description, holder, sectionId) VALUES(\''
-          + survey.title + '\',\''
-          + survey.description + '\',\''
-          + survey.holder + '\','
-          + survey.sectionId
-          + ');';
+    //validation part
+    var hasErr = false;
+    if (survey.stitle =='' || survey.stitle==null) {
+      survey.titleExcept='Please fill in title.';
+      hasErr = true;
+    }
+    else{
+      var cntQuestion = survey.questions.length;
+      for (var index = 0; index < survey.questions.length; index++) {
+        if (survey.questions[index].qDelete == STATUS_DELETE)
+          cntQuestion--;
+      }
+      if (cntQuestion < MIN_QUESTION_AMOUNT || cntQuestion > MAX_QUESTION_AMOUNT) {
+        survey.cntQuestionExcept = 'Question amount between 1 and 10.';
+        hasErr = true;
+      }
+      for (var i = 0; i < survey.questions.length; i++) {
+        var q = survey.questions[i];
+        if ((q.question == '' || q.question == null) && q.qDelete != STATUS_DELETE) {
+          survey.questions[i].questionExcept = 'Please fill in question.';
+          hasErr = true;
         }
-        //console.log('create survey: ' + sql);
-        var query = connection.query(sql, function(err, rows, fields) {
-          if (!err) {
-            console.log(rows);
-            if(surveyId == null)
-              surveyId = rows.insertId;
-          }
-          callback(err);
-        });
-      },
 
-      createQuestion: function(callback) {
-        //console.log(survey.questions);
-        async.eachSeries(survey.questions, function(questionHash, questionArrCallback){
-          var questionSql;
-          var questionId;
-          if (questionHash.qid == null || questionHash.qid == undefined) {
-            questionId = null;
-            questionSql = 'INSERT INTO Question(question, surveyId) VALUES(\''
-            + questionHash.question + '\','
-            + surveyId
-            + ');';
+        var cntItem = q.items.length;
+        for (var index = 0; index < q.items.length; index++) {
+          if (q.items[index].itemDelete == STATUS_DELETE)
+            cntItem--;
+        }
+        if (cntItem < MIN_ITEM_AMOUNT || cntItem > MAX_ITEM_AMOUNT) {
+          survey.questions[i].cntItemExcept = 'Item amount between 2 and 10.';
+          hasErr = true;
+        }
+        for (var j = 0; j < q.items.length; j++) {
+          var it = q.items[j];
+          if ((it.item == '' || it.item == null) && it.itemDelete != STATUS_DELETE) {
+            survey.questions[i].items[j].itemExcept = 'Please fill in item.';
+            hasErr = true;
+          }
+        }
+      }
+    }
+    if(hasErr) {
+      return res.render('edit-survey-form.html', {data: survey, msg: "Some input errors"});
+    }
+    else {
+      async.series({
+        createSurvey: function(callback) {
+          var sql;
+          if (survey.sid) {
+            sql = 'UPDATE Survey SET title=\''+survey.stitle+'\', description=\''+survey.sdesc+'\' WHERE id='+id+';';
+            surveyId = id;
           } else {
-            if (questionHash.qDelete == '1') {
-              questionSql = 'UPDATE Question SET status=0 WHERE id='+questionHash.qid+';';
-            } else {
-              questionSql = 'UPDATE Question SET question=\''+questionHash.question+'\' WHERE id='+questionHash.qid+';';
-            }
-            questionId = questionHash.qid;
+            surveyId = null;
+            sql = 'INSERT INTO Survey(title, description, holder, sectionId) VALUES(\''
+            + survey.stitle + '\',\''
+            + survey.sdesc + '\',\''
+            + survey.holder + '\','
+            + survey.sectionId
+            + ');';
           }
-          //console.log('create question: '+ questionSql);
-          async.series({
-            createQuestion: function(questionCallback) {
-              var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
-                if (!questionErr) {
-                  //console.log(questionRows)
-                  if (questionId == null)
-                    questionId = questionRows.insertId;
-                }
-                questionCallback(questionErr);
-              });
-            },
+          var query = connection.query(sql, function(err, rows, fields) {
+            if (!err) {
+              if(surveyId == null)
+                surveyId = rows.insertId;
+            }
+            callback(err);
+          });
+        },
 
-            createItem: function(itemArrCallback) {
-              async.eachSeries(questionHash.items, function(item, itemCallback){
-                console.log(item);
-                var itemSql;
-
-                if(item.itemId==undefined || item.itemId == null) {
-                  itemSql = 'INSERT INTO Item(item, questionId) VALUES(\''
-                  + item.itemVal +'\','
-                  + questionId
-                  + ');';
-                } else {
-                  if (item.itemDelete == '1') {
-                    itemSql = 'UPDATE Item SET status=0 WHERE id='+item.itemId+';';
-                  } else {
-                    itemSql = 'UPDATE Item SET item=\''+item.itemVal+'\' WHERE id='+item.itemId+';';
+        createQuestion: function(callback) {
+          async.eachSeries(survey.questions, function(questionHash, questionArrCallback){
+            var questionSql;
+            var questionId;
+            if (questionHash.qid == null || questionHash.qid == undefined) {
+              questionId = null;
+              questionSql = 'INSERT INTO Question(question, surveyId) VALUES(\''
+              + questionHash.question + '\','
+              + surveyId
+              + ');';
+            } else {
+              if (questionHash.qDelete == STATUS_DELETE) {
+                questionSql = 'UPDATE Question SET status=0 WHERE id='+questionHash.qid+';';
+              } else {
+                questionSql = 'UPDATE Question SET question=\''+questionHash.question+'\' WHERE id='+questionHash.qid+';';
+              }
+              questionId = questionHash.qid;
+            }
+            async.series({
+              createQuestion: function(questionCallback) {
+                var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
+                  if (!questionErr) {
+                    if (questionId == null)
+                      questionId = questionRows.insertId;
                   }
-                }
-                //console.log('create item: ' + itemSql);
-                var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
-                  if (!itemErr) {
-                    //to be editted
-                    console.log('success add item');
-                  }
-                  itemCallback(itemErr);
-                  //itermArrCallback?
+                  questionCallback(questionErr);
                 });
               },
-              function(itemEachSeriesErr){
-                if (!itemEachSeriesErr) {
-                  console.log('all items are added successfully');
-                }
-                itemArrCallback(itemEachSeriesErr);
-              });
-            }
-          }, questionArrCallback); //end async series in createQuestion
-        },
-        function(questionEachSeriesErr){
-          if (!questionEachSeriesErr) {
-            console.log('all questions are added successfully');
-          }
-          callback(questionEachSeriesErr);
-        }); //end async eachSeries in createQuestion
-      } // end createQuestion task
-    },
 
-    function(err) {
-      if (err) {
-        res.send(err);
-      } else {
-        res.send('success page');
-      }
-    }); //end async series in POST
+              createItem: function(itemArrCallback) {
+                async.eachSeries(questionHash.items, function(item, itemCallback){
+                  var itemSql;
+
+                  if(item.iid==undefined || item.iid == null) {
+                    itemSql = 'INSERT INTO Item(item, questionId) VALUES(\''
+                    + item.item +'\','
+                    + questionId
+                    + ');';
+                  } else {
+                    if (item.itemDelete == STATUS_DELETE) {
+                      itemSql = 'UPDATE Item SET status=0 WHERE id='+item.iid+';';
+                    } else {
+                      itemSql = 'UPDATE Item SET item=\''+item.item+'\' WHERE id='+item.iid+';';
+                    }
+                  }
+                  var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
+                    if (!itemErr) {
+                      //to be editted
+                      //console.log('success add item');
+                    }
+                    itemCallback(itemErr);
+                    //itermArrCallback?
+                  });
+                },
+                function(itemEachSeriesErr){
+                  if (!itemEachSeriesErr) {
+                    //console.log('all items are added successfully');
+                  }
+                  itemArrCallback(itemEachSeriesErr);
+                });
+              }
+            }, questionArrCallback); //end async series in createQuestion
+          },
+          function(questionEachSeriesErr){
+            if (!questionEachSeriesErr) {
+              //console.log('all questions are added successfully');
+            }
+            callback(questionEachSeriesErr);
+          }); //end async eachSeries in createQuestion
+        } // end createQuestion task
+      },
+
+      function(err) {
+        if (err) {
+          res.send(err);
+        } else {
+          res.send('success page');
+        }
+      }); //end async series in POST
+    }
   }
 });
 
@@ -478,8 +580,6 @@ app.all('/sections/add', function(req, res){
     var body = req.body;
 
     if (body.name == '' || body.name === undefined) {
-      console.log("empty name");
-      console.log(body);
       res.render('add-section-form.html', {
         except : 'no name',
         cache : body
@@ -495,7 +595,6 @@ app.all('/sections/add', function(req, res){
           res.render(err);
         }
       });
-      console.log(query.sql);
     }
   }
 });
@@ -503,5 +602,5 @@ app.all('/sections/add', function(req, res){
 var server = app.listen(3000, function() {
   var host = server.address().address;
   var port = server.address().port;
-  console.log('Example app listening at http://%s:%s', host, port);
+  console.log('app example: ' + host + ':' + port);
 });
