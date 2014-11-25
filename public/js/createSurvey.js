@@ -9,7 +9,7 @@ $(function() {
         '<div class="form-group item">\
           <label for="forItem1" class = "col-sm-2 control-label">Item</label>\
           <div class="col-sm-8">\
-            <input name="item" class="form-control" type="text" placeholder="item"/>\
+            <input name="item" class="form-control" type="text" placeholder="item" data-delete/>\
           </div>\
           <div class="col-sm-2">\
             <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>\
@@ -19,25 +19,26 @@ $(function() {
 
   $(document).on("click", ".delete_question_class", function(e) {
     var questionInputArr = $(this).closest('.question').find('input');
-    questionInputArr[0].dataset.delete = 1;
-    if (questionInputArr[0].dataset.id == '') {
+    questionInputArr[0].dataset.delete = '1';
+    console.log(questionInputArr[0].dataset);
+    if (questionInputArr[0].dataset.id==null || questionInputArr[0].dataset.id=='') {
       $(this).closest('.question').remove();
-      //console.log('question removed');
+      console.log('question removed');
     } else {
       $(this).closest('.question').hide();
-      //console.log('question hidden');
+      console.log('question hidden');
     }
   });
 
   $(document).on("click", ".delete_item_class",function(e) {
     var itemInput = $(this).parent().prev().find('input')[0];
-    itemInput.dataset.delete = 1;
+    itemInput.dataset.delete = '1';
     if (itemInput.dataset.id) {
       $(this).closest('.item').hide();
-      //console.log('item hidden');
+      console.log('item hidden');
     } else {
       $(this).closest('.item').remove();
-      //console.log('item removed');
+      console.log('item removed');
     }
   });
 
@@ -77,8 +78,8 @@ $(function() {
     survey.holder = "admin";
     survey.sectionId = 2;
 
-    survey.title=$("#forName").val().trim();
-    survey.description=$("#forDescription").val().trim();
+    survey.stitle = $("#forName").val().trim();
+    survey.sdesc = $("#forDescription").val().trim();
 
     var qs = [];
     var questions = $(".question");
@@ -100,12 +101,12 @@ $(function() {
         var it = {};
         var iId = arr[j].dataset.id;
         if (iId == undefined) {
-          it.itemId = null;
+          it.iid = null;
         } else {
-          it.itemId = parseInt(iId);
+          it.iid = parseInt(iId);
         }
         it.itemDelete = arr[j].dataset.delete;
-        it.itemVal = arr[j].value.trim();
+        it.item = arr[j].value.trim();
         is.push(it);
       }
       q.items = is;
@@ -132,31 +133,32 @@ $(function() {
     survey.holder = "admin";
     survey.sectionId = 2;
 
-    survey.title = $("#forName").val().trim();
+    survey.stitle = $("#forName").val().trim();
 
-    survey.description = $("#forDescription").val().trim();
+    survey.sdesc = $("#forDescription").val().trim();
 
     var qs = [];
     var record = []; //record the item num attached to the question
     var questions = $(".question");
     for (var i = 0; i < questions.length; i++) {
       var arr = $(questions[i]).find("input");
-      record.push(arr.length);
       var q = {};
       q.question = arr[0].value.trim();
       var is = [];
       for (var j = 1; j < arr.length; j++) {
-        is.push(arr[j].value.trim());
+        var it = {};
+        it.item = arr[j].value.trim();
+        is.push(it);
       }
       q.items = is;
       qs.push(q);
     }
 
     survey.questions = qs;
-
+    console.log(survey);
     surveyJson = JSON.stringify(survey);
 
-    $.post('/surveys/add', {surveyJSON: surveyJson, surveyREC: record}, function(data) {
+    $.post('/surveys/add', {surveyJSON: surveyJson}, function(data) {
       if (data == 'success page') {
         window.location.href = "/sections";
       } else {
