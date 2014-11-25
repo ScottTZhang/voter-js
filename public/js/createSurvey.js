@@ -8,10 +8,10 @@ $(function() {
     $(e.target).parent().parent().before(
         '<div class="form-group item">\
           <label for="forItem1" class = "col-sm-2 control-label">Item</label>\
-          <div class="col-sm-8">\
-            <input name="item" class="form-control" type="text" placeholder="item"/>\
+          <div class="col-sm-9">\
+            <input name="item" class="form-control" type="text" placeholder="item" />\
           </div>\
-          <div class="col-sm-2">\
+          <div class="col-sm-1">\
             <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>\
           </div>\
         </div>');
@@ -19,8 +19,8 @@ $(function() {
 
   $(document).on("click", ".delete_question_class", function(e) {
     var questionInputArr = $(this).closest('.question').find('input');
-    questionInputArr[0].dataset.delete = 1;
-    if (questionInputArr[0].dataset.id == '') {
+    questionInputArr[0].dataset.delete = '1';
+    if (questionInputArr[0].dataset.id == null || questionInputArr[0].dataset.id == '') {
       $(this).closest('.question').remove();
     } else {
       $(this).closest('.question').hide();
@@ -29,7 +29,7 @@ $(function() {
 
   $(document).on("click", ".delete_item_class",function(e) {
     var itemInput = $(this).parent().prev().find('input')[0];
-    itemInput.dataset.delete = 1;
+    itemInput.dataset.delete = '1';
     if (itemInput.dataset.id) {
       $(this).closest('.item').hide();
     } else {
@@ -43,19 +43,19 @@ $(function() {
         <div class="form-group">\
           </br>\
           <label for="forQuestion1" class = "col-sm-2 control-label">Question</label>\
-          <div class="col-sm-8">\
-            <input name="question" class="form-control" type="text" placeholder="Describe your question" data-delete/>\
+          <div class="col-sm-9">\
+            <input name="question" class="form-control" type="text" placeholder="Describe your question" />\
           </div>\
-          <div class="col-sm-2">\
+          <div class="col-sm-1">\
             <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete</button>\
           </div>\
         </div>\
         <div class="form-group item">\
           <label for="forItem1" class = "col-sm-2 control-label">Item</label>\
-          <div class="col-sm-8">\
-            <input name="item" class="form-control" type="text" placeholder="item" data-delete/>\
+          <div class="col-sm-9">\
+            <input name="item" class="form-control" type="text" placeholder="item" />\
           </div>\
-          <div class="col-sm-2">\
+          <div class="col-sm-1">\
             <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>\
           </div>\
         </div>\
@@ -73,8 +73,8 @@ $(function() {
     survey.holder = "admin";
     survey.sectionId = 2;
 
-    survey.title=$("#forName").val().trim();
-    survey.description=$("#forDescription").val().trim();
+    survey.stitle = $("#forName").val().trim();
+    survey.sdesc = $("#forDescription").val().trim();
 
     var qs = [];
     var questions = $(".question");
@@ -96,12 +96,12 @@ $(function() {
         var it = {};
         var iId = arr[j].dataset.id;
         if (iId == undefined) {
-          it.itemId = null;
+          it.iid = null;
         } else {
-          it.itemId = parseInt(iId);
+          it.iid = parseInt(iId);
         }
         it.itemDelete = arr[j].dataset.delete;
-        it.itemVal = arr[j].value.trim();
+        it.item = arr[j].value.trim();
         is.push(it);
       }
       q.items = is;
@@ -128,9 +128,9 @@ $(function() {
     survey.holder = "admin";
     survey.sectionId = 2;
 
-    survey.title = $("#forName").val().trim();
+    survey.stitle = $("#forName").val().trim();
 
-    survey.description = $("#forDescription").val().trim();
+    survey.sdesc = $("#forDescription").val().trim();
 
     var qs = [];
     var questions = $(".question");
@@ -140,14 +140,15 @@ $(function() {
       q.question = arr[0].value.trim();
       var is = [];
       for (var j = 1; j < arr.length; j++) {
-        is.push(arr[j].value.trim());
+        var it = {};
+        it.item = arr[j].value.trim();
+        is.push(it);
       }
       q.items = is;
       qs.push(q);
     }
 
     survey.questions = qs;
-
     surveyJson = JSON.stringify(survey);
 
     $.post('/surveys/add', {surveyJSON: surveyJson}, function(data) {
