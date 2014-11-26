@@ -80,7 +80,7 @@ app.get('/section/:id', function(req, res) {
 */
 app.all('/survey/:id', function(req, res) {
   var id = req.params.id;
-  var sql ='SELECT Question.id AS qid, Item.id AS iid,title,question,item from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
+  var sql ='SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Question.id AS qid, Item.id AS iid,question, item from Survey, Question, Item where Survey.id=' + id +' AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
 
   if (req.method == 'GET') {
     var query = connection.query(sql, function(err, rows, fields) {
@@ -89,8 +89,7 @@ app.all('/survey/:id', function(req, res) {
           res.status(404).send('Survey ' + id + ' is not found');
         } else {
           res.render('survey.html',{
-            questions: rows,
-            surveyId: id,
+            data: hashfyQuery(rows)
           });
         }
       } else {
@@ -108,7 +107,7 @@ app.all('/survey/:id', function(req, res) {
     var cnt = 0;
     async.series({
       countQuestion: function(callback) {
-        connection.query('SELECT COUNT(*) as cntQuestion from Question WHERE surveyId='+id, function(err, rows, field) {
+        connection.query('SELECT COUNT(*) as cntQuestion from Question WHERE Question.status=1 AND surveyId='+id, function(err, rows, field) {
           if (!err) {
             if (rows.length == 0) {
               res.status(404).send('Survey not found');
@@ -128,7 +127,7 @@ app.all('/survey/:id', function(req, res) {
               res.render('survey.html', {
                 msg: 'you have questions unfilled',
                 cache: body,
-                questions: rows
+                data: hashfyQuery(rows)
               });
             } else {
               res.render(err);
@@ -385,7 +384,7 @@ app.all('/surveys/edit/:id', function(req, res) {
           cntQuestion--;
       }
       if (cntQuestion < MIN_QUESTION_AMOUNT || cntQuestion > MAX_QUESTION_AMOUNT) {
-        survey.cntQuestionExcept = 'Question amount between 1 and 10.';
+        survey.cntQuestionExcept = 'Question amount between ' + MIN_QUESTION_AMOUNT+' and ' + MAX_QUESTION_AMOUNT + '.';
         hasErr = true;
       }
       for (var i = 0; i < survey.questions.length; i++) {
@@ -401,7 +400,7 @@ app.all('/surveys/edit/:id', function(req, res) {
             cntItem--;
         }
         if (cntItem < MIN_ITEM_AMOUNT || cntItem > MAX_ITEM_AMOUNT) {
-          survey.questions[i].cntItemExcept = 'Item amount between 2 and 10.';
+          survey.questions[i].cntItemExcept = 'Item amount between ' + MIN_ITEM_AMOUNT + ' and ' + MAX_ITEM_AMOUNT + '.';
           hasErr = true;
         }
         for (var j = 0; j < q.items.length; j++) {
