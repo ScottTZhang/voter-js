@@ -124,7 +124,6 @@ app.all('/survey/:id', function(req, res) {
         if (Object.keys(body).length < cnt) {
           var query = connection.query(sql, function(err, rows, fields) {
             if (!err) {
-              console.log(body); //shuqian
               res.render('survey.html', {
                 msg: 'you have questions unfilled',
                 cache: body,
@@ -154,17 +153,29 @@ app.all('/survey/:id', function(req, res) {
 
 app.get('/display/survey/:id', function(req, res) {
   var id = req.params.id;
-  var successSubmit = 'submit successfully';
   res.render('display.html', {
-    msg: successSubmit,
+    msg: 'submit successfully',
     id: id
   });
 });
 
+//shuqian
 app.get('/result/:id', function(req, res) {
   var id = req.params.id;
-  res.render('result.html', {
-    id: id
+  var sql ='SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Question.id AS qid, Item.id AS iid,question, item, Item.count AS icnt from Survey, Question, Item where Survey.id=' + id +' AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
+
+  var query = connection.query(sql, function(err, rows, fields) {
+    if (!err) {
+      if(rows.length == 0) {
+        res.status(404).send('Survey ' + id + ' is not found');
+      } else {
+        res.render('result.html',{
+          data: hashfyQuery(rows)
+        });
+      }
+    } else {
+      res.send(err);
+    }
   });
 });
 
@@ -327,9 +338,19 @@ function hashfyQuery(rows) {
       q.questionExcept = null;
       q.cntItemExcept = null;
 
+      var total = 0;
+      var j = i;
+      while (j < rows.length && rows[j].qid == rows[i].qid) {
+        total += rows[j].icnt;
+        j++;
+      }
+      q.total = total;
+
       var it = {};
       it.iid = rows[i].iid;
       it.item = rows[i].item;
+      it.icnt = rows[i].icnt;
+      it.percent = (q.total > 0) ? Math.round(it.icnt / q.total * 100) : 0;
       q.items.push(it);
 
       questions.push(q);
@@ -338,6 +359,8 @@ function hashfyQuery(rows) {
       var it = {};
       it.iid = rows[i].iid;
       it.item = rows[i].item;
+      it.icnt = rows[i].icnt;
+      it.percent = (q.total > 0) ? Math.round(it.icnt / q.total * 100) : 0;
       it.itemExcept = null;
       q.items.push(it);
     }
