@@ -124,6 +124,7 @@ app.all('/survey/:id', function(req, res) {
         if (Object.keys(body).length < cnt) {
           var query = connection.query(sql, function(err, rows, fields) {
             if (!err) {
+              console.log(body); //shuqian
               res.render('survey.html', {
                 msg: 'you have questions unfilled',
                 cache: body,

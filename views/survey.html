@@ -15,16 +15,11 @@
   <div class="container">
     <div class="row">
       </br>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">{{data.stitle}}</h3>
-        </div>
-        {% if data.sdesc != null and data.sdesc !="" %}
-          <div class="panel-body">
-            {{data.sdesc}}
-          </div>
-        {% endif %}
-      </div>
+      <h1>{{data.stitle}}</h1>
+      {% if data.sdesc != null and data.sdesc !="" %}
+        <p>{{data.sdesc}}</p>
+      {% endif %}
+      <hr />
       {% if msg %}
         <div class="alert alert-danger" role="alert">{{msg}}</div>
       {% endif %}
@@ -38,7 +33,7 @@
               {% for it in q.items %}
                 <div class="radio">
                   <label>
-                    <input type="radio" name="question_{{q.qid}}" id="option_{{it.iid}}" value="{{it.iid}}" {% if cache["question_"+q.qid] == it.iid  %}checked{% endif %} >
+                    <input type="radio" name="question_{{q.qid}}" id="option_{{it.iid}}" value="{{it.iid}}" {% if cache["question_"+q.qid] == it.iid %}checked{% endif %} >
                       {{it.item}}
                   </label>
                 </div>

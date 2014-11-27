@@ -45,7 +45,7 @@
         </div>
 
         {% for q in data.questions %}
-          <div class="question" {%if q.qDelete %}style="display:none;"{% endif %}>
+        <div class="question {% if q.qDelete %}hidden{% endif %}">
             <div class="form-group {% if q.questionExcept or q.cntItemExcept %}has-error{% endif %}">
               </br>
                 <label for="forQuestion" class = "col-sm-2 control-label">Question</label>
@@ -64,7 +64,7 @@
             </div>
 
             {% for it in q.items %}
-            <div class="form-group item {% if it.itemExcept %}has-error{% endif %}" {% if it.itemDelete %}style="display:none;"{%endif%}>
+            <div class="form-group item {% if it.itemExcept %}has-error{% endif %} {% if it.itemDelete %}hidden{% endif %}">
               <label for="forItem1" class = "col-sm-2 control-label">Item</label>
               <div class="col-sm-9">
                 <input name="item" class="form-control" type="text" placeholder="item" value="{{it.item}}" data-id="{{it.iid}}" {% if it.itemDelete %}data-delete="1"{% endif %} />
