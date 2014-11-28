@@ -33,17 +33,6 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-app.get('/', function(req, res) {
-  if (req.query.q) { // get string from query string in url ?q=...
-    var query = req.query.q;
-    res.render('index.html', {
-      source: query //give a name for body called source, source will be used in html file
-    });
-  } else {
-    res.render('index.html');
-  }
-});
-
 app.get('/sections', function(req, res) {// /sections is website page, and has nothing to do with file path
 
   var msg = req.query.msge; //get msge from quesry string in url, ?msge=...
