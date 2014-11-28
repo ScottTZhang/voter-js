@@ -12,9 +12,23 @@
 </head>
 
 <body>
-{% for survey in surveys %}
-  <p> {{survey.title}}
-{% endfor %}
+<div class="container">
+  <div class="row">
+    </br>
+    <h1>{{data[0].secname}}</h1>
+    {% if data[0].secdesc != null and data[0].secdesc !="" %}
+    <p>{{data[0].secdesc}}</p>
+    {% endif %}
+    <hr />
+
+    <div class="list-group">
+      {% for survey in data %}
+      <a href="/survey/{{survey.sid}}" class="list-group-item">{{survey.stitle}} <span class="badge">{{survey.holder}}</span></a>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
 </body>
 
 </html>
