@@ -33,13 +33,31 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-app.get('/sections', function(req, res) {// /sections is website page, and has nothing to do with file path
+app.get('/admin', function(req, res) {// / is website page, and has nothing to do with file path
 
   var msg = req.query.msge; //get msge from quesry string in url, ?msge=...
   connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
 
     if (!err) {
       res.render('sections.html', {
+        data : rows,
+        message : msg
+      });
+    } else {
+      res.send(err);
+    }
+  });
+
+});
+
+app.get('/', function(req, res) {// / is website page, and has nothing to do with file path
+
+  var msg = req.query.msge; //get msge from quesry string in url, ?msge=...
+  connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
+
+    if (!err) {
+      console.log(rows);
+      res.render('categories.html', {
         data : rows,
         message : msg
       });
@@ -58,7 +76,8 @@ app.get('/section/:id', function(req, res) {
     if (!err) {
       console.log(rows);
       res.render('section.html', {
-        data : rows
+        data: rows,
+        defaultId: id
       });
     } else {
       res.render(err);
@@ -172,7 +191,24 @@ app.get('/result/:id', function(req, res) {
 app.all('/surveys/add', function(req, res) {
   if (req.method == 'GET') {
     var body = req.body;
-    res.render('add-survey-form.html');
+    var defaultId = req.query.defaultid;
+
+    connection.query('SELECT * FROM Section WHERE status <> 0 ORDER BY Section.name', function(err, rows, fields){
+
+      if (!err) {
+        if (rows.length == 0) {
+          res.status(404).send('There are no sections. Please contact Admin to create a section first.'); //if query result is empty, return 404 page
+        }
+        else {
+          res.render('add-survey-form.html', {
+            categories: rows,
+            defaultId: defaultId
+          });
+        }
+      } else {
+        res.send(err);
+      }
+    });
   }
   else if (req.method == 'POST') {
     var body = req.body;
@@ -187,6 +223,10 @@ app.all('/surveys/add', function(req, res) {
       hasErr = true;
     }
     else{
+      if (survey.category == '' || survey.category == null) {
+        survey.categoryExcept = 'Please select a category.';
+        hasErr = true;
+      }
       var cntQuestion = survey.questions.length;
       if (cntQuestion < MIN_QUESTION_AMOUNT || cntQuestion > MAX_QUESTION_AMOUNT) {
         survey.cntQuestionExcept = 'Question amount between 1 and 10.';
