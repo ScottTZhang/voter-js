@@ -189,9 +189,18 @@ app.get('/result/:id', function(req, res) {
 });
 
 app.all('/surveys/add', function(req, res) {
+  var defaultId = req.query.defaultid;
+  var invalidCatMsg = null;
+
+  //validate defaultId
+  if (defaultId == parseInt(defaultId, 10)) {
+    invalidCatMsg = null;
+  } else {
+    invalidCatMsg = 'We find you are using an invalid category.';
+  }
+
   if (req.method == 'GET') {
     var body = req.body;
-    var defaultId = req.query.defaultid;
 
     connection.query('SELECT * FROM Section WHERE status <> 0 ORDER BY Section.name', function(err, rows, fields){
 
@@ -200,10 +209,14 @@ app.all('/surveys/add', function(req, res) {
           res.status(404).send('There are no sections. Please contact Admin to create a section first.'); //if query result is empty, return 404 page
         }
         else {
-          res.render('add-survey-form.html', {
-            categories: rows,
-            defaultId: defaultId
-          });
+          if (invalidCatMsg) {
+            res.send(invalidCatMsg);
+          } else {
+            res.render('add-survey-form.html', {
+              categories: rows,
+              defaultId: defaultId
+            });
+          }
         }
       } else {
         res.send(err);
@@ -255,9 +268,27 @@ app.all('/surveys/add', function(req, res) {
     }
 
     if(hasErr) {
-      return res.render('add-survey-form.html', {
-        data: survey,
-        msg: "Some input errors"
+
+      return connection.query('SELECT * FROM Section WHERE status <> 0 ORDER BY Section.name', function(err, rows, fields){
+        if (!err) {
+          if (rows.length == 0) {
+            res.status(404).send('There are no sections. Please contact Admin to create a section first.'); //if query result is empty, return 404 page
+          }
+          else {
+            if (invalidCatMsg) {
+              res.send(invalidCatMsg);
+            } else {
+              res.render('add-survey-form.html', {
+                categories: rows,
+                defaultId: defaultId,
+                data: survey,
+                msg: "Some input errors"
+              });
+            }
+          }
+        } else {
+          res.send(err);
+        }
       });
     }
     async.series({

@@ -133,16 +133,6 @@ $(function() {
 
     survey.category = $("#forCategory").val();
 
-    var ops = $("option");
-    var categories = [];
-    for (var i = 1; i < ops.length; i++) {
-      var category = {};
-      category.id = ops[i].value;
-      category.name = ops[i].innerText;
-      categories.push(category);
-    }
-    survey.categories = categories;
-
     var qs = [];
     var questions = $(".question");
     for (var i = 0; i < questions.length; i++) {
@@ -162,7 +152,7 @@ $(function() {
     survey.questions = qs;
     surveyJson = JSON.stringify(survey);
 
-    $.post('/surveys/add', {surveyJSON: surveyJson}, function(data) {
+    $.post(document.URL, {surveyJSON: surveyJson}, function(data) {
       if (data == 'success page') {
         window.location.href = "/";
       } else {

@@ -29,20 +29,14 @@
     {% endif %}
     <form class="form-horizontal" role="form">
 
-      <div class="form-group">
+      <div class="form-group {%if data.categoryExcept %}has-error{% endif %}">
         <label for="forCategory" class="col-sm-2 control-label">Category</label>
         <div class="col-sm-4">
           <select class="form-control" id="forCategory" name="category">
             <option value="">Select a Category</option>
-            {% if data.categories %}
-              {% for category in data.categories %}
-              <option value="{{category.id}}" {% if data.category == category.id%}selected="selected"{%endif%}  >{{category.name}}</option>
-              {% endfor %}
-            {% else %}
               {% for category in categories %}
-              <option value="{{category.id}}" {% if defaultId == category.id%}selected="selected"{%endif%}  >{{category.name}}</option>
+              <option value="{{category.id}}" {% if data and data.category == category.id %}selected="selected"{%elif not data and defaultId == category.id %}selected="selected"{%endif%}  >{{category.name}}</option>
               {% endfor %}
-            {% endif %}
           </select>
           {% if data.categoryExcept %}
           <span id="helpBlock" class="help-block">{{data.categoryExcept}}</span>
