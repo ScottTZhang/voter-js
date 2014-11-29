@@ -33,7 +33,7 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-app.get('/admin', function(req, res) {// / is website page, and has nothing to do with file path
+app.get('/sections', function(req, res) {// /sections is website page, and has nothing to do with file path
 
   var msg = req.query.msge; //get msge from quesry string in url, ?msge=...
   connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
@@ -50,32 +50,15 @@ app.get('/admin', function(req, res) {// / is website page, and has nothing to d
 
 });
 
-app.get('/', function(req, res) {// / is website page, and has nothing to do with file path
-
-  var msg = req.query.msge; //get msge from quesry string in url, ?msge=...
-  connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
-
-    if (!err) {
-      res.render('categories.html', {
-        data : rows,
-        message : msg
-      });
-    } else {
-      res.send(err);
-    }
-  });
-
-});
-
 /*  test: When select a section, show all surveys
 */
 app.get('/section/:id', function(req, res) {
   var id = req.params.id;
   var query = connection.query('SELECT Section.id, Section.name AS secname, Section.description AS secdesc, Survey.title AS stitle, Survey.description AS sdesc, Survey.id AS sid, Survey.holder from Section,Survey WHERE Survey.sectionId=Section.id AND Section.status=1 AND Survey.status=1 AND sectionId='+id, function(err, rows, fields) {
     if (!err) {
+      console.log(rows);
       res.render('section.html', {
-        data: rows,
-        defaultId: id
+        data : rows
       });
     } else {
       res.render(err);
@@ -187,39 +170,9 @@ app.get('/result/:id', function(req, res) {
 });
 
 app.all('/surveys/add', function(req, res) {
-  var defaultId = req.query.defaultid;
-  var invalidCatMsg = null;
-
-  //validate defaultId
-  if (defaultId == parseInt(defaultId, 10)) {
-    invalidCatMsg = null;
-  } else {
-    invalidCatMsg = 'We find you are using an invalid category.';
-  }
-
   if (req.method == 'GET') {
     var body = req.body;
-
-    connection.query('SELECT * FROM Section WHERE status <> 0 ORDER BY Section.name', function(err, rows, fields){
-
-      if (!err) {
-        if (rows.length == 0) {
-          res.status(404).send('There are no sections. Please contact Admin to create a section first.'); //if query result is empty, return 404 page
-        }
-        else {
-          if (invalidCatMsg) {
-            res.send(invalidCatMsg);
-          } else {
-            res.render('add-survey-form.html', {
-              categories: rows,
-              defaultId: defaultId
-            });
-          }
-        }
-      } else {
-        res.send(err);
-      }
-    });
+    res.render('add-survey-form.html');
   }
   else if (req.method == 'POST') {
     var body = req.body;
@@ -234,10 +187,6 @@ app.all('/surveys/add', function(req, res) {
       hasErr = true;
     }
     else{
-      if (survey.category == '' || survey.category == null) {
-        survey.categoryExcept = 'Please select a category.';
-        hasErr = true;
-      }
       var cntQuestion = survey.questions.length;
       if (cntQuestion < MIN_QUESTION_AMOUNT || cntQuestion > MAX_QUESTION_AMOUNT) {
         survey.cntQuestionExcept = 'Question amount between 1 and 10.';
@@ -266,27 +215,9 @@ app.all('/surveys/add', function(req, res) {
     }
 
     if(hasErr) {
-
-      return connection.query('SELECT * FROM Section WHERE status <> 0 ORDER BY Section.name', function(err, rows, fields){
-        if (!err) {
-          if (rows.length == 0) {
-            res.status(404).send('There are no sections. Please contact Admin to create a section first.'); //if query result is empty, return 404 page
-          }
-          else {
-            if (invalidCatMsg) {
-              res.send(invalidCatMsg);
-            } else {
-              res.render('add-survey-form.html', {
-                categories: rows,
-                defaultId: defaultId,
-                data: survey,
-                msg: "Some input errors"
-              });
-            }
-          }
-        } else {
-          res.send(err);
-        }
+      return res.render('add-survey-form.html', {
+        data: survey,
+        msg: "Some input errors"
       });
     }
     async.series({
@@ -295,7 +226,7 @@ app.all('/surveys/add', function(req, res) {
         + survey.stitle + '\',\''
         + survey.sdesc + '\',\''
         + survey.holder + '\','
-        + survey.category
+        + survey.sectionId
         + ');';
         var query = connection.query(sql, function(err, rows, fields) {
           if (!err) {
