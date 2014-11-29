@@ -126,11 +126,12 @@ $(function() {
   $("#create_survey_btn").click(function() {
     var survey = {};
     survey.holder = "admin";
-    survey.sectionId = 2;
 
     survey.stitle = $("#forName").val().trim();
 
     survey.sdesc = $("#forDescription").val().trim();
+
+    survey.category = $("#forCategory").val();
 
     var qs = [];
     var questions = $(".question");
@@ -151,9 +152,9 @@ $(function() {
     survey.questions = qs;
     surveyJson = JSON.stringify(survey);
 
-    $.post('/surveys/add', {surveyJSON: surveyJson}, function(data) {
+    $.post(document.URL, {surveyJSON: surveyJson}, function(data) {
       if (data == 'success page') {
-        window.location.href = "/sections";
+        window.location.href = "/";
       } else {
         document.open();
         document.write(data);
