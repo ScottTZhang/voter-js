@@ -56,7 +56,6 @@ app.get('/', function(req, res) {// / is website page, and has nothing to do wit
   connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
 
     if (!err) {
-      console.log(rows);
       res.render('categories.html', {
         data : rows,
         message : msg
@@ -74,7 +73,6 @@ app.get('/section/:id', function(req, res) {
   var id = req.params.id;
   var query = connection.query('SELECT Section.id, Section.name AS secname, Section.description AS secdesc, Survey.title AS stitle, Survey.description AS sdesc, Survey.id AS sid, Survey.holder from Section,Survey WHERE Survey.sectionId=Section.id AND Section.status=1 AND Survey.status=1 AND sectionId='+id, function(err, rows, fields) {
     if (!err) {
-      console.log(rows);
       res.render('section.html', {
         data: rows,
         defaultId: id
