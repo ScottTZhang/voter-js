@@ -15,11 +15,9 @@
 <div class="container">
   <div class="row">
     </br>
-    <h1>{{data[0].secname}}
-      <span><div class="pull-right"><a class="btn btn-default" href="/surveys/add?defaultid={{defaultId}}" role="button">Create Survey</a></div></span>
-    </h1>
+    <h1>{{data[0].secname}}</h1>
     {% if data[0].secdesc != null and data[0].secdesc !="" %}
-      <p>{{data[0].secdesc}}</p>
+    <p>{{data[0].secdesc}}</p>
     {% endif %}
     <hr />
 
