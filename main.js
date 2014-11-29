@@ -146,7 +146,7 @@ app.all('/survey/:id', function(req, res) {
           var updateSql = 'UPDATE Item SET count=count+1 WHERE id IN ('+itemIdtoUpdate.join(',') + ')';
           var query = connection.query(updateSql, function(err, rows, field) {
             if(!err) {
-              res.redirect('/display/survey/'+id);
+              res.redirect('/result/'+id);//display
               callback(null);
             } else {
               callback({code: 500, msg: err});
@@ -162,17 +162,9 @@ app.all('/survey/:id', function(req, res) {
   }
 });
 
-app.get('/display/survey/:id', function(req, res) {
-  var id = req.params.id;
-  res.render('display.html', {
-    msg: 'submit successfully',
-    id: id
-  });
-});
-
 app.get('/result/:id', function(req, res) {
   var id = req.params.id;
-  var sql ='SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Question.id AS qid, Item.id AS iid,question, item, Item.count AS icnt from Survey, Question, Item where Survey.id=' + id +' AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
+  var sql ='SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Survey.sectionId AS categoryId, Question.id AS qid, Item.id AS iid,question, item, Item.count AS icnt from Survey, Question, Item where Survey.id=' + id +' AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
 
   var query = connection.query(sql, function(err, rows, fields) {
     if (!err) {

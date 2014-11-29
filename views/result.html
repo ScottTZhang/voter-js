@@ -15,7 +15,9 @@
   <div class="container">
     <div class="row">
       </br>
-      <h1>{{data.stitle}}</h1>
+      <h1>{{data.stitle}}
+        <span class="pull-right"><div><a class="btn btn-default" href="/section/{{data.category}}" role="button">Go Back</a></div></span>
+      </h1>
       {% if data.sdesc != null and data.sdesc !="" %}
         <p>{{data.sdesc}}</p>
       {% endif %}
@@ -33,7 +35,7 @@
               <div class="col-xs-10">
                 <div class="progress">
                   <div class="progress-bar" role="progressbar" aria-valuenow="{{it.percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{it.percent}}%">
-                    {{it.percent}}%
+                    {{it.percent}}% ({{it.icnt}})
                   </div>
                 </div>
               </div>
