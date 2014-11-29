@@ -15,7 +15,9 @@
   <div class="container">
     <div class="row">
       </br>
-      <h1>{{data.stitle}}</h1>
+      <h1>{{data.stitle}}
+        <span><div class="pull-right"><a class="btn btn-default" href="/surveys/edit/{{data.sid}}" role="button">Edit Survey</a></div></span>
+      </h1>
       {% if data.sdesc != null and data.sdesc !="" %}
         <p>{{data.sdesc}}</p>
       {% endif %}
@@ -23,7 +25,7 @@
       {% if msg %}
         <div class="alert alert-danger" role="alert">{{msg}}</div>
       {% endif %}
-      <form method="POST" accept="/survey/{{surveyId}}" class="form-horizontal" role="form">
+      <form method="POST" accept="/survey/{{data.sid}}" class="form-horizontal" role="form">
         {% for q in data.questions %}
           <div class="panel panel-default">
             <div class="panel-heading">
@@ -32,10 +34,7 @@
             <div class="panel-body">
               {% for it in q.items %}
                 <div class="radio">
-                  <label>
-                    <input type="radio" name="question_{{q.qid}}" id="option_{{it.iid}}" value="{{it.iid}}" {% if cache["question_"+q.qid] == it.iid %}checked{% endif %} >
-                      {{it.item}}
-                  </label>
+                  <label><input type="radio" name="question_{{q.qid}}" id="option_{{it.iid}}" value="{{it.iid}}" {% if cache["question_"+q.qid] == it.iid %}checked{% endif %} >{{it.item}}</label>
                 </div>
               {% endfor %}
             </div>
