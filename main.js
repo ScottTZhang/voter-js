@@ -171,7 +171,6 @@ app.get('/result/:id', function(req, res) {
       if(rows.length == 0) {
         res.status(404).send('Survey ' + id + ' is not found');
       } else {
-        console.log(hashfyQuery(rows));
         res.render('result.html',{
           data: hashfyQuery(rows)
         });
