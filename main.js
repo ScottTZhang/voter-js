@@ -25,10 +25,10 @@ nunjucks.configure('views', {
 app.use('/public', express.static(path.join(__dirname, 'public'))); //can use files in /public directory
 
 var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : '1112',
-  database : 'voter'
+  host    : 'localhost',
+  user    : 'root',
+  password: '1112',
+  database: 'voter'
 });
 
 connection.connect();
@@ -40,8 +40,8 @@ app.get('/admin', function(req, res) {// / is website page, and has nothing to d
 
     if (!err) {
       res.render('sections.html', {
-        data : rows,
-        message : msg
+        data: rows,
+        message: msg
       });
     } else {
       res.send(err);
@@ -57,8 +57,8 @@ app.get('/', function(req, res) {// / is website page, and has nothing to do wit
 
     if (!err) {
       res.render('categories.html', {
-        data : rows,
-        message : msg
+        data: rows,
+        message: msg
       });
     } else {
       res.send(err);
@@ -117,14 +117,14 @@ app.all('/survey/:id', function(req, res) {
         connection.query('SELECT COUNT(*) as cntQuestion from Question WHERE Question.status=1 AND surveyId='+id, function(err, rows, field) {
           if (!err) {
             if (rows.length == 0) {
-              res.status(404).send('Survey not found');
+              callback({code: 404, msg: 'Survey not found'});
             } else {
               cnt = rows[0].cntQuestion;
+              callback(null);
             }
           } else {
-            res.render(err);
+            callback({code: 500, msg: err});
           }
-          callback(null);
         });
       },
       post: function(callback) {
@@ -136,10 +136,10 @@ app.all('/survey/:id', function(req, res) {
                 cache: body,
                 data: hashfyQuery(rows)
               });
+              callback(null);
             } else {
-              res.render(err);
+              callback({code: 500, msg: err});
             }
-            callback(null);
           });
         }
         else {
@@ -147,12 +147,16 @@ app.all('/survey/:id', function(req, res) {
           var query = connection.query(updateSql, function(err, rows, field) {
             if(!err) {
               res.redirect('/display/survey/'+id);
+              callback(null);
             } else {
-              res.render(err);
+              callback({code: 500, msg: err});
             }
-            callback(null);
           });
         }
+      }
+    }, function(err){
+      if (err) {
+        res.status(err.code).send(err.msg);
       }
     });
   }
@@ -166,7 +170,6 @@ app.get('/display/survey/:id', function(req, res) {
   });
 });
 
-//shuqian
 app.get('/result/:id', function(req, res) {
   var id = req.params.id;
   var sql ='SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Question.id AS qid, Item.id AS iid,question, item, Item.count AS icnt from Survey, Question, Item where Survey.id=' + id +' AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
@@ -383,7 +386,7 @@ function hashfyQuery(rows) {
   res.stitle = rows[0].stitle;
   res.sdesc = rows[0].sdesc;
   res.holder = 'admin'; //to be changed
-  res.sectionId = 2;//to be changed
+  res.category = rows[0].categoryId;//to be changed
   res.titleExcept = null;
   res.cntQuestionExcept = null;
 
@@ -433,21 +436,47 @@ app.all('/surveys/edit/:id', function(req, res) {
   var id = req.params.id;
 
   if ( req.method == 'GET') {
-    var sql ='SELECT Survey.id AS sid, Survey.title AS stitle, Survey.description as sdesc, Question.id AS qid, question, Item.id AS iid, item from Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.status=1 And Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
-    var query = connection.query(sql, function(err, rows, fields) {
-      if (!err) {
-        if(rows.length == 0) {
-          res.status(404).send('Survey ' + id + ' is not found');
-        } else {
-          res.render('edit-survey-form.html',{
-            data: hashfyQuery(rows)
-          });
-        }
-      } else {
-        res.send(err);
+    var categories = {};
+    async.series({
+      getCategories: function(callback) {
+        var sql = 'SELECT * FROM Section WHERE status <> 0 ORDER BY Section.name';
+        connection.query(sql, function(err, rows, field) {
+          if (!err) {
+            if (rows.length == 0) {
+              callback({code: 404, msg: 'There are no categories. Please contact Admin to create a category.'});
+            } else {
+              categories = rows;
+              callback(null);
+            }
+          } else {
+            callback({code: 500, msg: err});
+          }
+        });
+      },
+      get: function(callback) {
+        var sql = 'SELECT Section.id AS categoryId, Survey.id AS sid, Survey.title AS stitle, Survey.description as sdesc, Question.id AS qid, question, Item.id AS iid, item from Section,Survey,Question,Item where Survey.id=' + id +' AND Survey.status=1 AND Question.status=1 And Item.status=1 AND Section.id=Survey.sectionId AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
+        var query = connection.query(sql, function(err, rows, fields) {
+          if (!err) {
+            if(rows.length == 0) {
+              callback({code: 404, msg: 'Survey ' + id + ' is not found'});
+            } else {
+              res.render('edit-survey-form.html',{
+                data: hashfyQuery(rows),
+                categories: categories,
+              });
+              callback(null);
+            }
+          } else {
+            callback({code: 500, msg: err});
+          }
+        });
       }
-    });
-  }
+    }, function(err){
+      if (err) {
+        res.status(err.code).send(err.msg);
+      }
+    }); //end async.series
+  }//end get
   else if (req.method == 'POST') {
     var body = req.body;
     var survey = JSON.parse(body.surveyJSON);
@@ -461,6 +490,10 @@ app.all('/surveys/edit/:id', function(req, res) {
       hasErr = true;
     }
     else{
+      if (survey.category == '' || survey.category == null) {
+        survey.categoryExcept = 'Please select a category.';
+        hasErr = true;
+      }
       var cntQuestion = survey.questions.length;
       for (var index = 0; index < survey.questions.length; index++) {
         if (survey.questions[index].qDelete == '1')
@@ -496,16 +529,28 @@ app.all('/surveys/edit/:id', function(req, res) {
       }
     }
     if(hasErr) {
-      return res.render('edit-survey-form.html', {
-        data: survey,
-        msg: "Some input errors"
+      return connection.query('SELECT * FROM Section WHERE status <> 0 ORDER BY Section.name', function(err, rows, fields){
+        if (!err) {
+          if (rows.length == 0) {
+            res.status(404).send('There are no sections. Please contact Admin to create a section first.'); //if query result is empty, return 404 page
+          }
+          else {
+            res.render('edit-survey-form.html', {
+              categories: rows,
+              data: survey,
+              msg: "Some input errors"
+            });
+          }
+        } else {
+          res.send(err);
+        }
       });
     }
     async.series({
       createSurvey: function(callback) {
         var sql;
         if (survey.sid) {
-          sql = 'UPDATE Survey SET title=\''+survey.stitle+'\', description=\''+survey.sdesc+'\' WHERE id='+id+';';
+          sql = 'UPDATE Survey SET title=\''+survey.stitle+'\', description=\''+survey.sdesc+'\', sectionId='+ survey.category +' WHERE id='+id+';';
           surveyId = id;
         } else {
           surveyId = null;
@@ -513,7 +558,7 @@ app.all('/surveys/edit/:id', function(req, res) {
           + survey.stitle + '\',\''
           + survey.sdesc + '\',\''
           + survey.holder + '\','
-          + survey.sectionId
+          + survey.category
           + ');';
         }
         var query = connection.query(sql, function(err, rows, fields) {
@@ -608,7 +653,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
       if (!err) {
         if (rows.length > 0) {
           res.render('edit-section-form.html', {
-            data : rows[0]
+            data: rows[0]
           });
         } else {
           res.status(404).send('not found'); //if query result is empty, return 404 page
@@ -623,8 +668,8 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
     body.id = id;
     if (body.name == '' || body.name == undefined) {
       res.render('edit-section-form.html', {
-        data : body,
-        except : 'no name input'
+        data: body,
+        except: 'no name input'
       });
     }
     else {
@@ -652,8 +697,8 @@ app.all('/sections/add', function(req, res){
 
     if (body.name == '' || body.name === undefined) {
       res.render('add-section-form.html', {
-        except : 'no name',
-        cache : body
+        except: 'no name',
+        cache: body
       });
     }
     else {
