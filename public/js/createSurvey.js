@@ -126,7 +126,6 @@ $(function() {
   $("#create_survey_btn").click(function() {
     var survey = {};
     survey.holder = "admin";
-    survey.sectionId = 2;
 
     survey.stitle = $("#forName").val().trim();
 

@@ -44,6 +44,9 @@
               {% endfor %}
             {% endif %}
           </select>
+          {% if data.categoryExcept %}
+          <span id="helpBlock" class="help-block">{{data.categoryExcept}}</span>
+          {% endif %}
         </div>
       </div>
 

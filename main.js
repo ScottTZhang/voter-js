@@ -266,7 +266,7 @@ app.all('/surveys/add', function(req, res) {
         + survey.stitle + '\',\''
         + survey.sdesc + '\',\''
         + survey.holder + '\','
-        + survey.sectionId
+        + survey.category
         + ');';
         var query = connection.query(sql, function(err, rows, fields) {
           if (!err) {
