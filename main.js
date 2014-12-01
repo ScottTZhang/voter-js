@@ -365,7 +365,7 @@ app.get('/section/delete/:id', function(req, res) {
   var msg = 'delete suceessfully.';
   var query = connection.query('UPDATE Section SET status=0 WHERE id=' + id, function(err, rows, fields) {
     if (!err) {
-      res.redirect('/sections?msge='+msg);
+      res.redirect('/admin?msge='+msg);
     } else {
       res.render(err);
     }
@@ -668,7 +668,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
       var msg = 'edit successfully';
       var query = connection.query('UPDATE Section SET ? where id='+id, body, function(err, rows, fields){ // this will automatic match table column names with names in body, and change values
         if (!err) {
-          res.redirect('/sections?msge='+msg);//make msg a part of query string so that req.query.msge will find msg
+          res.redirect('/admin?msge='+msg);//make msg a part of query string so that req.query.msge will find msg
         } else {
           res.send(err);
         }
@@ -698,7 +698,7 @@ app.all('/sections/add', function(req, res){
       var values = '\'' + body.name + '\',\'' + body.description + '\','+ 1;
       var query = connection.query('INSERT INTO Section(name, description, status) VALUES('+values+')', function(err, rows, fields) {
         if (!err) {
-          res.redirect('/sections?msge='+msg);
+          res.redirect('/admin?msge='+msg);
         } else {
           res.render(err);
         }

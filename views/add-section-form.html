@@ -1,21 +1,8 @@
+{% extends "parent.html" %}
+  {% block pagetitle %}Add a Category{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="">
-<meta name="author" content="">
-<title>Add a Section</title>
-<!-- Bootstrap core CSS -->
-<link href="/public/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body>
-<div class="container">
-  <div class="row">
-    <h1>Add a section</h1>
+  {% block view %}
+    <h1>Add a category</h1>
     <p>Here you can add a new section.</p>
     {% if except != '' %}
     <div class="alert alert-warning" role="alert">
@@ -43,7 +30,4 @@
     </form>
 
     <p><a href="/sections">Home page</a></p>
-  </div>
-</div>
-</body>
-</html>
+  {% endblock %}

@@ -1,22 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="">
-<meta name="author" content="">
-<title>voter sections</title>
-<!-- Bootstrap core CSS -->
-<link href="/public/css/bootstrap.min.css" rel="stylesheet">
-</head>
+{% extends "parent.html" %}
+  {% block pagetitle %}Let's Vote!{% endblock %}
 
-<body>
-  <div class="container">
-    <div class="row">
+  {% block view %}
       </br>
       <h1>{{data.stitle}}
-        <span><div class="pull-right"><a class="btn btn-default" href="/surveys/edit/{{data.sid}}" role="button">Edit Survey</a></div></span>
+        <span class="pull-right"><div><a class="btn btn-default" href="/surveys/edit/{{data.sid}}" role="button">Edit Survey</a></div></span>
       </h1>
       {% if data.sdesc != null and data.sdesc !="" %}
         <p>{{data.sdesc}}</p>
@@ -41,13 +29,9 @@
           </div>
         {% endfor %}
         <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-10">
+          <div class="col-sm-10">
             <button type="submit" class="btn btn-default">Submit</button>
           </div>
         </div>
       </form>
-    </div>
-  </div>
-</body>
-
-</html>
+  {% endblock %}

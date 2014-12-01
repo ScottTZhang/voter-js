@@ -1,20 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="">
-<meta name="author" content="">
-<title>Edit a Section</title>
-<!-- Bootstrap core CSS -->
-<link href="/public/css/bootstrap.min.css" rel="stylesheet">
-</head>
-
-<body>
-<div class="container">
-  <div class="rows">
-    <h1>Edit a section</h1>
+{% extends "parent.html" %}
+  {% block pagetitle %}Edit a Category{% endblock %}
+  {% block view %}
+    <h1>Edit a category</h1>
     <p>Here you can edit a section.</p>
     {% if except %}
     <div class="alert alert-warning" role="alert">
@@ -42,7 +29,4 @@
         </div>
       </div>
     </form>
-  </div>
-</div>
-</body>
-</html>
+  {% endblock %}
