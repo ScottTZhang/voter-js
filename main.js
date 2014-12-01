@@ -85,10 +85,8 @@ app.get('/section/:id', function(req, res) {
 */
 app.all('/survey/:id', function(req, res) {
   var id = req.params.id;
-  var sql ='SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Question.id AS qid, Item.id AS iid,question, item from Survey, Question, Item where Survey.id=' + connection.escape(id) +' AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
-
   if (req.method == 'GET') {
-    var query = connection.query(sql, function(err, rows, fields) {
+    var query = connection.query('SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Question.id AS qid, Item.id AS iid,question, item from Survey, Question, Item where Survey.id=? AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;', [id], function(err, rows, fields) {
       if (!err) {
         if(rows.length == 0) {
           res.status(404).send('Survey ' + id + ' is not found');
@@ -162,9 +160,7 @@ app.all('/survey/:id', function(req, res) {
 
 app.get('/result/:id', function(req, res) {
   var id = req.params.id;
-  var sql ='SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Survey.sectionId AS categoryId, Question.id AS qid, Item.id AS iid,question, item, Item.count AS icnt from Survey, Question, Item where Survey.id=' + connection.escape(id) +' AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
-
-  var query = connection.query(sql, function(err, rows, fields) {
+  var query = connection.query('SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Survey.sectionId AS categoryId, Question.id AS qid, Item.id AS iid,question, item, Item.count AS icnt from Survey, Question, Item where Survey.id=? AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;', [id], function(err, rows, fields) {
     if (!err) {
       if(rows.length == 0) {
         res.status(404).send('Survey ' + id + ' is not found');
@@ -423,8 +419,7 @@ app.all('/surveys/edit/:id', function(req, res) {
         });
       },
       get: function(callback) {
-        var sql = 'SELECT Section.id AS categoryId, Survey.id AS sid, Survey.title AS stitle, Survey.description as sdesc, Question.id AS qid, question, Item.id AS iid, item from Section,Survey,Question,Item where Survey.id=' + connection.escape(id)+' AND Survey.status=1 AND Question.status=1 And Item.status=1 AND Section.id=Survey.sectionId AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;';
-        var query = connection.query(sql, function(err, rows, fields) {
+        var query = connection.query('SELECT Section.id AS categoryId, Survey.id AS sid, Survey.title AS stitle, Survey.description as sdesc, Question.id AS qid, question, Item.id AS iid, item from Section,Survey,Question,Item where Survey.id=? AND Survey.status=1 AND Question.status=1 And Item.status=1 AND Section.id=Survey.sectionId AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;', [id], function(err, rows, fields) {
           if (!err) {
             if(rows.length == 0) {
               callback({code: 404, msg: 'Survey ' + id + ' is not found'});
@@ -530,7 +525,6 @@ app.all('/surveys/edit/:id', function(req, res) {
           + connection.escape(survey.category)
           + ');';
         }
-        console.log(sql);
         var query = connection.query(sql, function(err, rows, fields) {
           if (!err) {
             if(surveyId == null)
@@ -560,7 +554,6 @@ app.all('/surveys/edit/:id', function(req, res) {
           }
           async.series({
             createQuestion: function(questionCallback) {
-              console.log(questionSql);
               var addQuestionQuery = connection.query(questionSql, function(questionErr, questionRows, questionFields) {
                 if (!questionErr) {
                   if (questionId == null)
@@ -586,7 +579,6 @@ app.all('/surveys/edit/:id', function(req, res) {
                     itemSql = 'UPDATE Item SET item=' + connection.escape(item.item) + ' WHERE id=' + connection.escape(item.iid) + ';';
                   }
                 }
-                console.log(itemSql);
                 var addItemQuery = connection.query(itemSql, function(itemErr, itemRows, itemFields) {
                   if (!itemErr) {
                   }
