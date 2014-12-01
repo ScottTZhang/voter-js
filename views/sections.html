@@ -4,15 +4,12 @@
 {% block view %}
 <div class="col-xs-12">
   <h1>List of All Sections</h1>
-  <p>Here you can see the list of the teams, edit them, remove or update.</p>
+  <p>Here you can see the list of the teams, edit them, remove or update.<a href = "/admin/categories/add" class="pull-right btn btn-default">add a section</a></p></br>
   {% if message %}
   <div class="alert alert-success" role="alert">
     {{ message }}
   </div>
   {% endif %}
-  <p>
-  <a href = "/sections/add" class="pull-right btn btn-primary">add a section</a><br>
-  </p>
 </div>
 
 <div class="col-xs-12">
@@ -32,8 +29,8 @@
       <td>{{ row.name }}</td>
       <td>{{ row.description }}</td>
       <td>
-        <a href="/sections/edit/{{ row.id }}" class="btn btn-primary">Edit</a>&nbsp;
-        <a href="/section/delete/{{ row.id }}" class="btn btn-danger">Delete</a>
+        <a href="/admin/categories/edit/{{ row.id }}" class="btn btn-primary">Edit</a>&nbsp;
+        <a href="/admin/category/delete/{{ row.id }}" class="btn btn-danger">Delete</a>
       </td>
     </tr>
     {% endfor %}
