@@ -66,35 +66,38 @@ CREATE TABLE `Item` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-INSERT INTO `Section` (`id`, `name`, `description`, `status`) VALUES (1, 'study', 'let\'s study', 1);
-INSERT INTO `Section` (`id`, `name`, `description`, `status`) VALUES (2, 'work', 'keep working', 1);
-INSERT INTO `Section` (`id`, `name`, `description`, `status`) VALUES (3, 'car', 'top gear', 1);
-INSERT INTO `Section` (`id`, `name`, `description`, `status`) VALUES (4, 'women', 'ask women', 1);
+INSERT INTO `Section` (`id`, `name`, `description`, `status`) VALUES (1, 'Study', 'Don\'t play around. Go study!', 1);
+INSERT INTO `Section` (`id`, `name`, `description`, `status`) VALUES (2, 'Work', 'For the money. For the party', 1);
+INSERT INTO `Section` (`id`, `name`, `description`, `status`) VALUES (3, 'Car', 'Let the engine roar!', 1);
+INSERT INTO `Section` (`id`, `name`, `description`, `status`) VALUES (4, 'Travelling', 'Which one is on the way? Your mind or body?', 1);
 
-INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (1, 'how many FWB do you have?', 'as you see', 1, 'admin', 4);
-INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (2, 'what is your car?', 'as you see', 1, 'admin', 3);
-INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (3, 'how much do you make?', 'as you see', 1, 'admin', 2);
-INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (4, 'what college are you from?', 'as you see', 1, 'admin', 1);
-INSERT INTO `Survey` (`title`, `description`, `status`, `holder`, `sectionId`) VALUES ('what is your major?', 'for living, not for fun!', 1, 'admin', 1);
+INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (1, 'Are you from the Ivy League?', 'Including A, B, C, D, E, F, G, H, I, K.', 1, 'admin', 1);
+INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (2, 'How much do you make?', 'As the title', 1, 'admin', 2);
+INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (3, 'What is your car?', 'As the title', 1, 'admin', 3);
+INSERT INTO `Survey` (`id`, `title`, `description`, `status`, `holder`, `sectionId`) VALUES (4, 'Have you been to Thailand?', 'As the title.', 1, 'admin', 4);
 
-INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (1,'how old are you?!', 1, 1);
-INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (2,'which country?!', 1, 4);
-INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (3,'which state/province?!', 1, 4);
-INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (4,'what is school name?', 1, 4);
-INSERT INTO `Question` (`question`, `status`, `surveyId`) VALUES ('what is your job?', 1, 2);
+INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (1,'Is one of them?', 1, 1);
+INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (2,'Which state/province?!', 1, 1);
+INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (3,'What is school name?', 1, 1);
+INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (4,'Give me a number.', 1, 2);
+INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (5,'Tell me the brand.', 1, 3);
+INSERT INTO `Question` (`id`, `question`, `status`, `surveyId`) VALUES (6,'Did you go to Thailand?', 1, 4);
 
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('11-20', 1, 1);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('21-30', 1, 1);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('United States', 1, 2);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('China', 1, 2);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('India', 1, 2);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('IL', 1, 3);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('CA', 1, 3);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Guangxi', 1, 3);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('NU', 1, 4);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('NYU', 1, 4);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('UW', 1, 4);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('山东蓝翔', 1, 4);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Student', 1, 5);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Software Development Vase', 1, 5);
-INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Software Development Dog', 1, 5);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Yes. I am proud.', 1, 1);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('No. Not that nerdy and geeky and smart.', 1, 1);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('IL', 1, 2);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('CA', 1, 2);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('NY', 1, 2);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('NU', 1, 3);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('NYU', 1, 3);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('UW', 1, 3);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('山东蓝翔', 1, 3);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('So much.', 1, 4);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('So poor.', 1, 4);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('It\'s a secret, dude!', 1, 4);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Chevy', 1, 5);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Audi', 1, 5);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Honda', 1, 5);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('BMW', 1, 5);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('Yes.', 1, 6);
+INSERT INTO `Item` (`item`, `status`, `questionId`) VALUES ('No.', 1, 6);
