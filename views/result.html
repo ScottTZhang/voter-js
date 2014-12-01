@@ -1,35 +1,35 @@
 {% extends "parent.html" %}
-  {% block pagetitle %}Check out the result{% endblock %}
+{% block pagetitle %}Check out the result{% endblock %}
 
-  {% block view %}
-      </br>
-      <h1>{{data.stitle}}
-        <span class="pull-right"><div><a class="btn btn-default" href="/section/{{data.category}}" role="button">Go Back</a></div></span>
-      </h1>
-      {% if data.sdesc != null and data.sdesc !="" %}
-        <p>{{data.sdesc}}</p>
-      {% endif %}
-      <hr />
-    {% for q in data.questions %}
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h4 class="panel-title">{{q.question}}</h4>
-        </div>
-        <div class="panel-body">
-          {% for it in q.items %}
-            <div class="row">
-              <label for="forItem1" class = "col-xs-2 control-label">{{it.item}}</label>
-              <div class="col-xs-10">
-                <div class="progress">
-                  <div class="progress-bar" role="progressbar" aria-valuenow="{{it.percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{it.percent}}%">
-                    {{it.percent}}% ({{it.icnt}})
-                  </div>
-                </div>
-              </div>
-              <div class="clearfix visible-xs-block"></div>
-            </div>
-          {% endfor %}
+{% block view %}
+</br>
+<h1>{{data.stitle}}
+  <span class="pull-right"><div><a class="btn btn-default" href="/section/{{data.category}}" role="button">Go Back</a></div></span>
+</h1>
+{% if data.sdesc != null and data.sdesc !="" %}
+<p>{{data.sdesc}}</p>
+{% endif %}
+<hr />
+{% for q in data.questions %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4 class="panel-title">{{q.question}}</h4>
+  </div>
+  <div class="panel-body">
+    {% for it in q.items %}
+    <div class="row">
+      <label for="forItem1" class = "col-xs-2 control-label">{{it.item}}</label>
+      <div class="col-xs-10">
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-valuenow="{{it.percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{it.percent}}%">
+            {{it.percent}}% ({{it.icnt}})
+          </div>
         </div>
       </div>
+      <div class="clearfix visible-xs-block"></div>
+    </div>
     {% endfor %}
-  {% endblock %}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

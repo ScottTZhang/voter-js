@@ -1,19 +1,19 @@
 {% extends "parent.html" %}
-  {% block pagetitle %}All categories{% endblock %}
+{% block pagetitle %}All categories{% endblock %}
 
-  {% block view %}
-    <h1>List of All Categories</h1>
-    {% if message %}
-    <div class="alert alert-success" role="alert">
-      {{ message }}
-    </div>
-    {% endif %}
-    <hr />
+{% block view %}
+<h1>List of All Categories</h1>
+{% if message %}
+<div class="alert alert-success" role="alert">
+  {{ message }}
+</div>
+{% endif %}
+<hr />
 
-    <div class="list-group">
-      {% for section in data %}
-      <a href="/section/{{section.id}}" class="list-group-item">{{section.name}}</a>
-      {% endfor %}
-    </div>
+<div class="list-group">
+  {% for section in data %}
+  <a href="/section/{{section.id}}" class="list-group-item">{{section.name}}</a>
+  {% endfor %}
+</div>
 
-  {% endblock %}
+{% endblock %}

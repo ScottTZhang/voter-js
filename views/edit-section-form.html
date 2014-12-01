@@ -1,32 +1,32 @@
 {% extends "parent.html" %}
-  {% block pagetitle %}Edit a Category{% endblock %}
-  {% block view %}
-    <h1>Edit a category</h1>
-    <p>Here you can edit a section.</p>
-    {% if except %}
-    <div class="alert alert-warning" role="alert">
-      {{ except }}
+{% block pagetitle %}Edit a Category{% endblock %}
+{% block view %}
+<h1>Edit a category</h1>
+<p>Here you can edit a section.</p>
+{% if except %}
+<div class="alert alert-warning" role="alert">
+  {{ except }}
+</div>
+{% endif %}
+<form method="POST" action="/sections/edit/{{data.id}}" class="form-horizontal" role="form"><!--action means the post will make effect on which url-->
+
+  <div class="form-group form-group-lg">
+    <label for="forName" class="col-sm-2 control-label">Name</label>
+    <div class="col-sm-10">
+      <input type="text" name="name" class="form-control input-lg" id="forName" placeholder="create a name here" value="{{data.name}}"><!--use 'name' attribute so the name and value will be store in req.body-->
     </div>
-    {% endif %}
-    <form method="POST" action="/sections/edit/{{data.id}}" class="form-horizontal" role="form"><!--action means the post will make effect on which url-->
+  </div>
 
-      <div class="form-group form-group-lg">
-        <label for="forName" class="col-sm-2 control-label">Name</label>
-        <div class="col-sm-10">
-          <input type="text" name="name" class="form-control input-lg" id="forName" placeholder="create a name here" value="{{data.name}}"><!--use 'name' attribute so the name and value will be store in req.body-->
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="forDescription" class="col-sm-2 control-label">Description</label>
-        <div class="col-sm-10">
-          <textarea name="description" class="form-control" placeholder="put some description" id="forDescription" rows="3">{{data.description}}</textarea> <!--value is between tag-->
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-          <input type="submit" class="btn btn-default" value="Save"> <!--use input tag as submit buttom-->
-        </div>
-      </div>
-    </form>
-  {% endblock %}
+  <div class="form-group">
+    <label for="forDescription" class="col-sm-2 control-label">Description</label>
+    <div class="col-sm-10">
+      <textarea name="description" class="form-control" placeholder="put some description" id="forDescription" rows="3">{{data.description}}</textarea> <!--value is between tag-->
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <input type="submit" class="btn btn-default" value="Save"> <!--use input tag as submit buttom-->
+    </div>
+  </div>
+</form>
+{% endblock %}

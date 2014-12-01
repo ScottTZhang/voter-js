@@ -1,141 +1,140 @@
-
 {% extends "parent.html" %}
-  {% block pagetitle %}Create a Survey{% endblock %}
-  {% block customjs %}<script src="/public/js/createSurvey.js"></script>{% endblock %}
-  {% block view %}
-    <h1>Create a Survey</h1>
-    <p>Here you can create a new survey.</p>
-    {% if msg %}
-    <div class="alert alert-danger" role="alert">
-      {{ msg }}
-    </div>
-    {% endif %}
-    <form class="form-horizontal" role="form">
+{% block pagetitle %}Create a Survey{% endblock %}
+{% block customjs %}<script src="/public/js/createSurvey.js"></script>{% endblock %}
+{% block view %}
+<h1>Create a Survey</h1>
+<p>Here you can create a new survey.</p>
+{% if msg %}
+<div class="alert alert-danger" role="alert">
+  {{ msg }}
+</div>
+{% endif %}
+<form class="form-horizontal" role="form">
 
-      <div class="form-group {%if data.categoryExcept %}has-error{% endif %}">
-        <label for="forCategory" class="col-sm-2 control-label">Category</label>
-        <div class="col-sm-4">
-          <select class="form-control" id="forCategory" name="category">
-            <option value="">Select a Category</option>
-              {% for category in categories %}
-              <option value="{{category.id}}" {% if data and data.category == category.id %}selected="selected"{%elif not data and defaultId == category.id %}selected="selected"{%endif%}  >{{category.name}}</option>
-              {% endfor %}
-          </select>
-          {% if data.categoryExcept %}
-          <span id="helpBlock" class="help-block">{{data.categoryExcept}}</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="form-group form-group-lg {% if data.titleExcept or data.cntQuestionExcept %}has-error{% endif %}">
-        <label for="forName" class="col-sm-2 control-label">Survey Title</label>
-        <div class="col-sm-10">
-          <input name="name" class="form-control input-lg" type="text" id="forName" placeholder="Create a title here" {% if data %}value="{{data.stitle}}"{% endif %}/>
-          {% if data.titleExcept %}
-          <span id="helpBlock" class="help-block">{{data.titleExcept}}</span>
-          {% endif %}
-          {% if data.cntQuestionExcept %}
-          <span id="helpBlock" class="help-block">{{data.cntQuestionExcept}}</span>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="forDescription" class="col-sm-2 control-label">Description</label>
-        <div class="col-sm-10">
-          <textarea id="forDescription" name="description" class="form-control" placeholder="Description" rows="3">{% if data %}{{data.sdesc}}{% endif %}</textarea>
-        </div>
-      </div>
-
-
-      {% if data %}
-        {% for q in data.questions %}
-          <div class="question">
-            <div class="form-group {% if q.questionExcept or q.cntItemExcept %}has-error{% endif %}">
-              </br>
-                <label for="forQuestion" class = "col-sm-2 control-label">Question</label>
-                <div class="col-sm-9">
-                  <input name="question" class="form-control" type="text" placeholder="Describe your question" value="{{q.question}}" data-id="{{q.qid}}" />
-                  {% if q.questionExcept %}
-                    <span id="helpBlock" class="help-block">{{q.questionExcept}}</span>
-                  {% endif %}
-                  {% if q.cntItemExcept %}
-                    <span id="helpBlock" class="help-block">{{q.cntItemExcept}}</span>
-                  {% endif %}
-                </div>
-                <div class="col-sm-1">
-                  <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete</button>
-                </div>
-            </div>
-
-            {% for it in q.items %}
-              <div class="form-group item {% if it.itemExcept %}has-error{% endif %}">
-                <label for="forItem1" class = "col-sm-2 control-label">Item</label>
-                <div class="col-sm-9">
-                  <input name="item" class="form-control" type="text" placeholder="item" value="{{it.item}}" data-id="{{it.iid}}" />
-                  {% if it.itemExcept %}
-                    <span id="helpBlock" class="help-block">{{it.itemExcept}}</span>
-                  {% endif %}
-                </div>
-                <div class="col-sm-1">
-                  <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>
-                </div>
-              </div>
-            {% endfor %}
-
-            <div class="form-group add_item">
-              <div class="col-sm-offset-2 col-sm-10">
-                <button type="button" class="btn btn-default add_item_class">Add Item</button>
-              </div>
-            </div>
-
-          </div><!--end of question class -->
+  <div class="form-group {%if data.categoryExcept %}has-error{% endif %}">
+    <label for="forCategory" class="col-sm-2 control-label">Category</label>
+    <div class="col-sm-4">
+      <select class="form-control" id="forCategory" name="category">
+        <option value="">Select a Category</option>
+        {% for category in categories %}
+        <option value="{{category.id}}" {% if data and data.category == category.id %}selected="selected"{%elif not data and defaultId == category.id %}selected="selected"{%endif%}  >{{category.name}}</option>
         {% endfor %}
-
-      {% else %}
-        <div class="question">
-          <div class="form-group">
-            </br>
-            <label for="forQuestion" class = "col-sm-2 control-label">Question</label>
-            <div class="col-sm-9">
-              <input name="question" class="form-control" type="text" placeholder="Describe your question" />
-            </div>
-            <div class="col-sm-1">
-              <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete</button>
-            </div>
-          </div>
-
-          <div class="form-group item">
-            <label for="forItem1" class = "col-sm-2 control-label">Item</label>
-            <div class="col-sm-9">
-              <input name="item" class="form-control" type="text" placeholder="item" />
-            </div>
-            <div class="col-sm-1">
-              <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>
-            </div>
-          </div>
-
-          <div class="form-group add_item">
-            <div class="col-sm-offset-2 col-sm-10">
-              <button type="button" class="btn btn-default add_item_class">Add Item</button>
-            </div>
-          </div>
-        </div>
+      </select>
+      {% if data.categoryExcept %}
+      <span id="helpBlock" class="help-block">{{data.categoryExcept}}</span>
       {% endif %}
+    </div>
+  </div>
 
-      <div class="form-group add_question">
-        </br>
-        <div class="col-sm-offset-2 col-sm-10">
-          <input type="button" id="add_question_btn" class="btn btn-default" value="Add Question">
-        </div>
+  <div class="form-group form-group-lg {% if data.titleExcept or data.cntQuestionExcept %}has-error{% endif %}">
+    <label for="forName" class="col-sm-2 control-label">Survey Title</label>
+    <div class="col-sm-10">
+      <input name="name" class="form-control input-lg" type="text" id="forName" placeholder="Create a title here" {% if data %}value="{{data.stitle}}"{% endif %}/>
+      {% if data.titleExcept %}
+      <span id="helpBlock" class="help-block">{{data.titleExcept}}</span>
+      {% endif %}
+      {% if data.cntQuestionExcept %}
+      <span id="helpBlock" class="help-block">{{data.cntQuestionExcept}}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="forDescription" class="col-sm-2 control-label">Description</label>
+    <div class="col-sm-10">
+      <textarea id="forDescription" name="description" class="form-control" placeholder="Description" rows="3">{% if data %}{{data.sdesc}}{% endif %}</textarea>
+    </div>
+  </div>
+
+
+  {% if data %}
+  {% for q in data.questions %}
+  <div class="question">
+    <div class="form-group {% if q.questionExcept or q.cntItemExcept %}has-error{% endif %}">
+      </br>
+      <label for="forQuestion" class = "col-sm-2 control-label">Question</label>
+      <div class="col-sm-9">
+        <input name="question" class="form-control" type="text" placeholder="Describe your question" value="{{q.question}}" data-id="{{q.qid}}" />
+        {% if q.questionExcept %}
+        <span id="helpBlock" class="help-block">{{q.questionExcept}}</span>
+        {% endif %}
+        {% if q.cntItemExcept %}
+        <span id="helpBlock" class="help-block">{{q.cntItemExcept}}</span>
+        {% endif %}
       </div>
-
-      <div class="form-group">
-        </br>
-        <div class="col-sm-offset-2 col-sm-10">
-          <input type="button" id="create_survey_btn" class="btn btn-default" value="Create Survey">
-        </div>
+      <div class="col-sm-1">
+        <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete</button>
       </div>
+    </div>
 
-    </form>
-  {% endblock %}
+    {% for it in q.items %}
+    <div class="form-group item {% if it.itemExcept %}has-error{% endif %}">
+      <label for="forItem1" class = "col-sm-2 control-label">Item</label>
+      <div class="col-sm-9">
+        <input name="item" class="form-control" type="text" placeholder="item" value="{{it.item}}" data-id="{{it.iid}}" />
+        {% if it.itemExcept %}
+        <span id="helpBlock" class="help-block">{{it.itemExcept}}</span>
+        {% endif %}
+      </div>
+      <div class="col-sm-1">
+        <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="form-group add_item">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="button" class="btn btn-default add_item_class">Add Item</button>
+      </div>
+    </div>
+
+  </div><!--end of question class -->
+  {% endfor %}
+
+  {% else %}
+  <div class="question">
+    <div class="form-group">
+      </br>
+      <label for="forQuestion" class = "col-sm-2 control-label">Question</label>
+      <div class="col-sm-9">
+        <input name="question" class="form-control" type="text" placeholder="Describe your question" />
+      </div>
+      <div class="col-sm-1">
+        <button type="button" class="btn btn-warning btn-sm delete_question_class">Delete</button>
+      </div>
+    </div>
+
+    <div class="form-group item">
+      <label for="forItem1" class = "col-sm-2 control-label">Item</label>
+      <div class="col-sm-9">
+        <input name="item" class="form-control" type="text" placeholder="item" />
+      </div>
+      <div class="col-sm-1">
+        <button type="button" class="btn btn-warning btn-sm delete_item_class">Delete</button>
+      </div>
+    </div>
+
+    <div class="form-group add_item">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="button" class="btn btn-default add_item_class">Add Item</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="form-group add_question">
+    </br>
+    <div class="col-sm-offset-2 col-sm-10">
+      <input type="button" id="add_question_btn" class="btn btn-default" value="Add Question">
+    </div>
+  </div>
+
+  <div class="form-group">
+    </br>
+    <div class="col-sm-offset-2 col-sm-10">
+      <input type="button" id="create_survey_btn" class="btn btn-default" value="Create Survey">
+    </div>
+  </div>
+
+</form>
+{% endblock %}

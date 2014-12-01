@@ -1,21 +1,21 @@
 {% extends "parent.html" %}
-  {% block pagetitle %}Choose a vote{% endblock %}
+{% block pagetitle %}Choose a vote{% endblock %}
 
-  {% block view %}
-    </br>
-    <h1>{{data[0].secname}}
-      <span class="pull-right">
-        <div><a class="btn btn-default" href="/" role="button">Go Back</a>&nbsp;<a class="btn btn-default" href="/surveys/add?defaultid={{defaultId}}" role="button">Create Survey</a></div>
-      </span>
-    </h1>
-    {% if data[0].secdesc != null and data[0].secdesc !="" %}
-      <p>{{data[0].secdesc}}</p>
-    {% endif %}
-    <hr />
+{% block view %}
+</br>
+<h1>{{data[0].secname}}
+  <span class="pull-right">
+    <div><a class="btn btn-default" href="/" role="button">Go Back</a>&nbsp;<a class="btn btn-default" href="/surveys/add?defaultid={{defaultId}}" role="button">Create Survey</a></div>
+  </span>
+</h1>
+{% if data[0].secdesc != null and data[0].secdesc !="" %}
+<p>{{data[0].secdesc}}</p>
+{% endif %}
+<hr />
 
-    <div class="list-group">
-      {% for survey in data %}
-      <a href="/survey/{{survey.sid}}" class="list-group-item">{{survey.stitle}} <span class="badge">{{survey.holder}}</span></a>
-      {% endfor %}
-    </div>
-  {% endblock %}
+<div class="list-group">
+  {% for survey in data %}
+  <a href="/survey/{{survey.sid}}" class="list-group-item">{{survey.stitle}} <span class="badge">{{survey.holder}}</span></a>
+  {% endfor %}
+</div>
+{% endblock %}
