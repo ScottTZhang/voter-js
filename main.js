@@ -67,8 +67,6 @@ app.get('/', function(req, res) {// / is website page, and has nothing to do wit
 
 });
 
-/*  test: When select a section, show all surveys
-*/
 app.get('/section/:id', function(req, res) {
   var id = req.params.id;
   var query = connection.query('SELECT Section.id, Section.name AS secname, Section.description AS secdesc, Survey.title AS stitle, Survey.description AS sdesc, Survey.id AS sid, Survey.holder from Section,Survey WHERE Survey.sectionId=Section.id AND Section.status=1 AND Survey.status=1 AND sectionId='+id, function(err, rows, fields) {
@@ -78,7 +76,7 @@ app.get('/section/:id', function(req, res) {
         defaultId: id
       });
     } else {
-      res.render(err);
+      res.status(500).send(err);
     }
   });
 });
@@ -345,7 +343,7 @@ app.all('/surveys/add', function(req, res) {
 
     function(err) {
       if (err) {
-        res.render(err);
+        res.status(500).send(err);
       } else {
         res.send('success page');
       }
@@ -693,7 +691,7 @@ app.all('/admin/categories/add', function(req, res){
         if (!err) {
           res.redirect('/admin/categories?msge='+msg);
         } else {
-          res.render(err);
+          res.status(500).send(err);
         }
       });
     }

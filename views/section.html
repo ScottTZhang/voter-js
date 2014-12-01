@@ -2,6 +2,10 @@
 {% block pagetitle %}Choose a vote{% endblock %}
 
 {% block view %}
+{% if data.length == 0 %}
+</br>
+<p>There is no survey in this category. <a class="btn btn-default" href="/">Home page</a> <a class="btn btn-default" href="/surveys/add?defaultid={{defaultId}}" role="button">Create Survey</a></p>
+{%else%}
 </br>
 <h1>{{data[0].secname}}
   <span class="pull-right">
@@ -18,4 +22,5 @@
   <a href="/survey/{{survey.sid}}" class="list-group-item">{{survey.stitle}} <span class="badge">{{survey.holder}}</span></a>
   {% endfor %}
 </div>
+{% endif %}
 {% endblock %}
