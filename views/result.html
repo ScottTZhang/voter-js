@@ -1,50 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="">
-<meta name="author" content="">
-<title>voter sections</title>
-<!-- Bootstrap core CSS -->
-<link href="/public/css/bootstrap.min.css" rel="stylesheet">
-</head>
+{% extends "parent.html" %}
+{% block pagetitle %}Check out the result{% endblock %}
 
-<body>
-  <div class="container">
+{% block view %}
+</br>
+<h1>{{data.stitle}}
+  <span class="pull-right"><div><a class="btn btn-default" href="/section/{{data.category}}" role="button">Go Back</a></div></span>
+</h1>
+{% if data.sdesc != null and data.sdesc !="" %}
+<p>{{data.sdesc}}</p>
+{% endif %}
+<hr />
+{% for q in data.questions %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4 class="panel-title">{{q.question}}</h4>
+  </div>
+  <div class="panel-body">
+    {% for it in q.items %}
     <div class="row">
-      </br>
-      <h1>{{data.stitle}}
-        <span class="pull-right"><div><a class="btn btn-default" href="/section/{{data.category}}" role="button">Go Back</a></div></span>
-      </h1>
-      {% if data.sdesc != null and data.sdesc !="" %}
-        <p>{{data.sdesc}}</p>
-      {% endif %}
-      <hr />
-    </div>
-    {% for q in data.questions %}
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h4 class="panel-title">{{q.question}}</h4>
-        </div>
-        <div class="panel-body">
-          {% for it in q.items %}
-            <div class="row">
-              <label for="forItem1" class = "col-xs-2 control-label">{{it.item}}</label>
-              <div class="col-xs-10">
-                <div class="progress">
-                  <div class="progress-bar" role="progressbar" aria-valuenow="{{it.percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{it.percent}}%">
-                    {{it.percent}}% ({{it.icnt}})
-                  </div>
-                </div>
-              </div>
-              <div class="clearfix visible-xs-block"></div>
-            </div>
-          {% endfor %}
+      <label for="forItem1" class = "col-xs-2 control-label">{{it.item}}</label>
+      <div class="col-xs-10">
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-valuenow="{{it.percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{it.percent}}%">
+            {{it.percent}}% ({{it.icnt}})
+          </div>
         </div>
       </div>
+      <div class="clearfix visible-xs-block"></div>
+    </div>
     {% endfor %}
   </div>
-</body>
-</html>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,38 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="">
-<meta name="author" content="">
-<title>voter sections</title>
-<!-- Bootstrap core CSS -->
-<link href="/public/css/bootstrap.min.css" rel="stylesheet">
-</head>
+{% extends "parent.html" %}
+{% block pagetitle %}Choose a vote{% endblock %}
 
-<body>
-<div class="container">
-  <div class="row">
-    </br>
-    <h1>{{data[0].secname}}
-      <span class="pull-right">
-        <div><a class="btn btn-default" href="/" role="button">Go Back</a>&nbsp;<a class="btn btn-default" href="/surveys/add?defaultid={{defaultId}}" role="button">Create Survey</a></div>
-      </span>
-    </h1>
-    {% if data[0].secdesc != null and data[0].secdesc !="" %}
-      <p>{{data[0].secdesc}}</p>
-    {% endif %}
-    <hr />
+{% block view %}
+</br>
+<h1>{{data[0].secname}}
+  <span class="pull-right">
+    <div><a class="btn btn-default" href="/" role="button">Go Back</a>&nbsp;<a class="btn btn-default" href="/surveys/add?defaultid={{defaultId}}" role="button">Create Survey</a></div>
+  </span>
+</h1>
+{% if data[0].secdesc != null and data[0].secdesc !="" %}
+<p>{{data[0].secdesc}}</p>
+{% endif %}
+<hr />
 
-    <div class="list-group">
-      {% for survey in data %}
-      <a href="/survey/{{survey.sid}}" class="list-group-item">{{survey.stitle}} <span class="badge">{{survey.holder}}</span></a>
-      {% endfor %}
-    </div>
-
-  </div>
+<div class="list-group">
+  {% for survey in data %}
+  <a href="/survey/{{survey.sid}}" class="list-group-item">{{survey.stitle}} <span class="badge">{{survey.holder}}</span></a>
+  {% endfor %}
 </div>
-</body>
-
-</html>
+{% endblock %}
