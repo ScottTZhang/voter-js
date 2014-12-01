@@ -33,7 +33,7 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-app.get('/admin', function(req, res) {// / is website page, and has nothing to do with file path
+app.get('/admin/categories', function(req, res) {// / is website page, and has nothing to do with file path
 
   var msg = req.query.msge; //get msge from quesry string in url, ?msge=...
   connection.query('SELECT * FROM Section WHERE status <> 0', function(err, rows, fields){
@@ -353,21 +353,14 @@ app.all('/surveys/add', function(req, res) {
   } //end POST
 });
 
-/* test: When edit a item from a question in a suvey, get the item id from:
- *  SELECT Item.id,title,question,item from Survey,Question,Item where Survey.id=4 And Survey.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id;
- *  get the question id from :SELECT Question.id,title,question from Survey,Question where Survey.id=4 And Survey.status=1 AND Question.surveyId=Survey.id;
- *  get the item id from: Select Item.id from Question,Item where Question.status=1 AND Question.id=Item.questionId;
- *  count the question in the survey: SELECT COUNT(*) from Survey, Question where Survey.status=1 AND Survey.id=4 AND Question.surveyId=Survey.id AND Question.Status=1;
- */
-
-app.get('/section/delete/:id', function(req, res) {
+app.get('/admin/category/delete/:id', function(req, res) {
   var id = req.params.id;
   var msg = 'delete suceessfully.';
   var query = connection.query('UPDATE Section SET status=0 WHERE id=' + id, function(err, rows, fields) {
     if (!err) {
-      res.redirect('/admin?msge='+msg);
+      res.redirect('/admin/categories?msge='+msg);
     } else {
-      res.render(err);
+      res.status(500).send(err);
     }
   });
 });
@@ -638,7 +631,7 @@ app.all('/surveys/edit/:id', function(req, res) {
   }
 });
 
-app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in this part of url is called 'id'
+app.all('/admin/categories/edit/:id', function(req, res) { //:id means the parameter in this part of url is called 'id'
   var id = req.params.id; //get the 'id' part from the url, not from qurey string; from query string use req.query.'...'
   if (req.method == 'GET') {//req default method is GET
     connection.query('SELECT * FROM Section WHERE id='+id, function(err, rows, fields){
@@ -668,7 +661,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
       var msg = 'edit successfully';
       var query = connection.query('UPDATE Section SET ? where id='+id, body, function(err, rows, fields){ // this will automatic match table column names with names in body, and change values
         if (!err) {
-          res.redirect('/admin?msge='+msg);//make msg a part of query string so that req.query.msge will find msg
+          res.redirect('/admin/categories?msge='+msg);//make msg a part of query string so that req.query.msge will find msg
         } else {
           res.send(err);
         }
@@ -679,7 +672,7 @@ app.all('/sections/edit/:id', function(req, res) { //:id means the parameter in 
 
 /* problem: when input name is '', it should not post
 */
-app.all('/sections/add', function(req, res){
+app.all('/admin/categories/add', function(req, res){
   if (req.method == 'GET') {
     res.render('add-section-form.html');
   }
@@ -698,7 +691,7 @@ app.all('/sections/add', function(req, res){
       var values = '\'' + body.name + '\',\'' + body.description + '\','+ 1;
       var query = connection.query('INSERT INTO Section(name, description, status) VALUES('+values+')', function(err, rows, fields) {
         if (!err) {
-          res.redirect('/admin?msge='+msg);
+          res.redirect('/admin/categories?msge='+msg);
         } else {
           res.render(err);
         }
