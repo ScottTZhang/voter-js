@@ -125,7 +125,7 @@ app.all('/survey/:id', function(req, res) {
       },
       post: function(callback) {
         if (Object.keys(body).length < cnt) {
-          var query = connection.query(sql, function(err, rows, fields) {
+          var query = connection.query('SELECT Survey.id as sid, Survey.title AS stitle, Survey.description AS sdesc, Question.id AS qid, Item.id AS iid,question, item from Survey, Question, Item where Survey.id=? AND Survey.status=1 AND Question.status=1 AND Item.status=1 AND Question.surveyId=Survey.id AND Item.questionId=Question.id ORDER BY qid,iid;', [id], function(err, rows, fields) {
             if (!err) {
               res.render('survey.html', {
                 msg: 'you have questions unfilled',
