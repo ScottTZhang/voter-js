@@ -17,7 +17,7 @@ app.use(bodyparser.urlencoded({
   extended:true
 }));
 
-nunjucks.configure('views', {
+nunjucks.configure(__dirname + '/views', {
   autoescape: true,
   express: app
 });
